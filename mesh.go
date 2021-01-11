@@ -10,8 +10,10 @@ package morph
 */
 import "C"
 import (
+	"fmt"
 	"image"
 	"io"
+	"math"
 	"unsafe"
 )
 
@@ -150,5 +152,28 @@ func (m *Mesh) ImagePoints() [][]image.Point {
 
 // Write outputs a mesh that's compatible with morph, xmorph, and gtkmorph.
 func (m *Mesh) Write(w io.Writer) error {
-	return nil // TODO: Write this function.
+	// Write the two header lines.
+	var err error
+	if _, err = fmt.Fprintln(w, "M2"); err != nil {
+		return err
+	}
+	nx, ny := int(m.mesh.nx), int(m.mesh.ny)
+	if _, err = fmt.Fprintln(w, nx, ny); err != nil {
+		return err
+	}
+
+	// Write all of the data.
+	np := nx * ny
+	xp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.x))[:np:np]
+	yp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.y))[:np:np]
+	lp := (*[1 << 30]C.int)(unsafe.Pointer(m.mesh.label))[:np:np]
+	for i := range xp {
+		x := math.Round(float64(xp[i]) * 10.0)
+		y := math.Round(float64(yp[i]) * 10.0)
+		_, err = fmt.Fprintf(w, "%.0f %.0f %d\n", x, y, lp[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
