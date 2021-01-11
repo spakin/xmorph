@@ -6,7 +6,9 @@ package morph
 import (
 	"bytes"
 	"image"
+	"math"
 	"math/rand"
+	"strings"
 	"testing"
 )
 
@@ -263,6 +265,103 @@ feature 2
 	if actual != expected {
 		t.Logf(actual)
 		t.Fatalf("unexpected output (expected %d bytes; observed %d bytes)", len(expected), len(actual))
+	}
+}
+
+// TestReadMesh ensures we can read a mesh file into a Mesh.
+func TestReadMesh(t *testing.T) {
+	meshStr := `M2
+5 4
+0 0 0
+13 0 0
+25 0 0
+38 0 0
+50 0 0
+0 18 0
+13 18 0
+25 18 0
+38 18 0
+50 18 0
+0 35 0
+13 35 0
+25 35 0
+38 35 0
+50 35 0
+0 53 0
+13 53 0
+25 53 0
+38 53 0
+50 53 0
+<SIS>
+<orig>
+6 7
+</orig>
+<rect>
+0 0 5 6
+</rect>
+<eye>
+1.666667 1.750000
+</eye>
+<eye>
+3.333333 1.750000
+</eye>
+<eye>
+2.500000 3.500000
+</eye>
+</SIS>
+<resulting image size>
+6 7
+</resulting image size>
+<features>
+<name>
+feature 0
+</name>
+<name>
+feature 1
+</name>
+<name>
+feature 2
+</name>
+</features>
+`
+
+	// Define a function that checks the mesh values.
+	validate := func(m *Mesh) {
+		sl := m.Points()
+		for j := range sl {
+			for i := range sl[j] {
+				pt := Point{
+					X: math.Round(float64(i)*12.5) / 10.0,
+					Y: math.Round(float64(j)*17.5) / 10.0,
+				}
+				if sl[j][i] != pt {
+					t.Fatalf("expected (%d, %d) = %v but observed %v", i, j, pt, sl[j][i])
+				}
+			}
+		}
+	}
+
+	// Ensure we can read the mesh and receive the values we expect.
+	m, err := ReadMesh(strings.NewReader(meshStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	validate(m)
+
+	// Ensure we can read a mesh that lacks subimage data.
+	lines := strings.Split(meshStr, "\n")
+	m, err = ReadMesh(strings.NewReader(strings.Join(lines[:22], "\n")))
+	if err != nil {
+		t.Fatal(err)
+	}
+	validate(m)
+
+	// Ensure that any other subset returns an error.
+	for n := 21; n >= 0; n-- {
+		m, err = ReadMesh(strings.NewReader(strings.Join(lines[:n], "\n")))
+		if err == nil {
+			t.Fatalf("truncating a mesh file to %d lines was supposed to return an error but didn't", n)
+		}
 	}
 }
 
