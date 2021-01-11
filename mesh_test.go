@@ -16,7 +16,10 @@ func TestNewMesh(t *testing.T) {
 	m2 := NewMesh(101, 7)       // Wide and short
 	m3 := NewMesh(7, 101)       // Tall and narrow
 	m4 := NewMesh(30000, 30000) // Very large
-	_, _, _, _ = m1, m2, m3, m4
+	m1.Free()
+	m2.Free()
+	m3.Free()
+	m4.Free()
 }
 
 // random2DImagePoints allocates and populates a 2-D slice with random
@@ -93,6 +96,12 @@ func TestMeshFromImagePoints(t *testing.T) {
 	compareImagePointSlices(t, i2, o2)
 	compareImagePointSlices(t, i3, o3)
 	compareImagePointSlices(t, i4, o4)
+
+	// Deallocate libmorph resources.
+	m1.Free()
+	m2.Free()
+	m3.Free()
+	m4.Free()
 }
 
 // random2DPoints allocates and populates a 2-D slice with random morph.Points.
@@ -168,4 +177,10 @@ func TestMeshFromPoints(t *testing.T) {
 	comparePointSlices(t, i2, o2)
 	comparePointSlices(t, i3, o3)
 	comparePointSlices(t, i4, o4)
+
+	// Deallocate libmorph resources.
+	m1.Free()
+	m2.Free()
+	m3.Free()
+	m4.Free()
 }

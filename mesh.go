@@ -34,6 +34,12 @@ func NewMesh(nx, ny int) *Mesh {
 	return m
 }
 
+// Free deallocates the mesh memory managed by libmorph.
+func (m *Mesh) Free() {
+	C.meshUnref(m.mesh)
+	m.mesh = nil
+}
+
 // MeshFromPoints creates a new mesh from a 2-D slice of morph.Points.
 func MeshFromPoints(s [][]Point) *Mesh {
 	// Sanity check the mesh lest libmorph doesn't write something itself
