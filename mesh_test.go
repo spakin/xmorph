@@ -227,9 +227,41 @@ func TestWrite(t *testing.T) {
 25 53 0
 38 53 0
 50 53 0
+<SIS>
+<orig>
+5 5
+</orig>
+<rect>
+0 0 5 5
+</rect>
+<eye>
+1.666667 1.750000
+</eye>
+<eye>
+3.333333 1.750000
+</eye>
+<eye>
+2.500000 3.500000
+</eye>
+</SIS>
+<resulting image size>
+5 5
+</resulting image size>
+<features>
+<name>
+feature 0
+</name>
+<name>
+feature 1
+</name>
+<name>
+feature 2
+</name>
+</features>
 `
 	actual := buf.String()
 	if actual != expected {
+		t.Logf(actual)
 		t.Fatalf("unexpected output (expected %d bytes; observed %d bytes)", len(expected), len(actual))
 	}
 }

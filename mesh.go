@@ -150,6 +150,28 @@ func (m *Mesh) ImagePoints() [][]image.Point {
 	return s
 }
 
+// meshRanges returns the x and y ranges of the mesh data.
+func (m *Mesh) meshRanges() (Point, Point) {
+	// Represent the MeshT's flat lists of x and y values as Go slices.
+	nx, ny := int(m.mesh.nx), int(m.mesh.ny)
+	np := nx * ny
+	xp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.x))[:np:np]
+	yp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.y))[:np:np]
+
+	// Find the coordinates of the upper left and lower right
+	// corners of the mesh.
+	ul := Point{X: float64(xp[0]), Y: float64(yp[0])}
+	lr := ul
+	for i := 0; i < np; i++ {
+		x, y := float64(xp[i]), float64(yp[i])
+		ul.X = math.Min(ul.X, x)
+		ul.Y = math.Min(ul.Y, y)
+		lr.X = math.Max(lr.X, x)
+		lr.Y = math.Max(lr.Y, y)
+	}
+	return ul, lr
+}
+
 // Write outputs a mesh that's compatible with morph, xmorph, and gtkmorph.
 func (m *Mesh) Write(w io.Writer) error {
 	// Write the two header lines.
@@ -174,6 +196,55 @@ func (m *Mesh) Write(w io.Writer) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	// Write the subimage information.
+	ul, lr := m.meshRanges()
+	dx, dy := lr.X-ul.X, lr.Y-ul.Y
+	eye1 := Point{X: ul.X + dx/3, Y: ul.Y + dy/3}
+	eye2 := Point{X: ul.X + 2*dx/3, Y: ul.Y + dy/3}
+	eye3 := Point{X: ul.X + dx/2, Y: ul.Y + 2*dy/3}
+	_, err = fmt.Fprintf(w, `<SIS>
+<orig>
+%.0f %.0f
+</orig>
+<rect>
+%.0f %.0f %.0f %.0f
+</rect>
+<eye>
+%.6f %.6f
+</eye>
+<eye>
+%.6f %.6f
+</eye>
+<eye>
+%.6f %.6f
+</eye>
+</SIS>
+<resulting image size>
+%.0f %.0f
+</resulting image size>
+<features>
+<name>
+feature 0
+</name>
+<name>
+feature 1
+</name>
+<name>
+feature 2
+</name>
+</features>
+`,
+		math.Round(dx), math.Round(dy),
+		math.Round(ul.X), math.Round(ul.Y),
+		math.Round(lr.X), math.Round(lr.Y),
+		eye1.X, eye1.Y,
+		eye2.X, eye2.Y,
+		eye3.X, eye3.Y,
+		math.Round(dx), math.Round(dy))
+	if err != nil {
+		return err
 	}
 	return nil
 }
