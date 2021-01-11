@@ -48,19 +48,51 @@ func random2DImagePoints(rng *rand.Rand, nx, ny int) [][]image.Point {
 	return s
 }
 
+// compareImageePointSlices tests that two 2-D slices of morph.Points are the
+// same size and contain the same values.  It aborts if not.
+func compareImagePointSlices(t *testing.T, s1, s2 [][]image.Point) {
+	if len(s1) != len(s2) {
+		t.Fatalf("mismatched row counts (%d vs. %d)", len(s1), len(s2))
+	}
+	for j, row := range s1 {
+		if len(s1[j]) != len(s2[j]) {
+			t.Fatalf("mismatched column counts in row %d (%d vs. %d)", j, len(s1[j]), len(s2[j]))
+		}
+		for i := range row {
+			if s1[j][i] != s2[j][i] {
+				t.Fatalf("mismatched values at s[%d][%d]: %v vs. %v", j, i, s1[j][i], s2[j][i])
+			}
+		}
+	}
+}
+
 // TestMeshFromImagePoints ensures we can create meshes from various-sized
 // 2-D slices of image.Points.
 func TestMeshFromImagePoints(t *testing.T) {
+	// Create a set of slices.
 	rng := rand.New(rand.NewSource(11))
-	s1 := random2DImagePoints(rng, 4, 4) // Minimal mesh size
-	m1 := MeshFromImagePoints(s1)
-	s2 := random2DImagePoints(rng, 101, 7) // Wide and short
-	m2 := MeshFromImagePoints(s2)
-	s3 := random2DImagePoints(rng, 7, 101) // Tall and narrow
-	m3 := MeshFromImagePoints(s3)
-	s4 := random2DImagePoints(rng, 3000, 3000) // Large
-	m4 := MeshFromImagePoints(s4)
-	_, _, _, _ = m1, m2, m3, m4
+	i1 := random2DImagePoints(rng, 4, 4)       // Minimal mesh size
+	i2 := random2DImagePoints(rng, 101, 7)     // Wide and short
+	i3 := random2DImagePoints(rng, 7, 101)     // Tall and narrow
+	i4 := random2DImagePoints(rng, 3000, 3000) // Large
+
+	// Convert slices to meshes.
+	m1 := MeshFromImagePoints(i1)
+	m2 := MeshFromImagePoints(i2)
+	m3 := MeshFromImagePoints(i3)
+	m4 := MeshFromImagePoints(i4)
+
+	// Convert meshes back to slices.
+	o1 := m1.ImagePoints()
+	o2 := m2.ImagePoints()
+	o3 := m3.ImagePoints()
+	o4 := m4.ImagePoints()
+
+	// Ensure the before and after slices match.
+	compareImagePointSlices(t, i1, o1)
+	compareImagePointSlices(t, i2, o2)
+	compareImagePointSlices(t, i3, o3)
+	compareImagePointSlices(t, i4, o4)
 }
 
 // random2DPoints allocates and populates a 2-D slice with random morph.Points.
@@ -91,17 +123,49 @@ func random2DPoints(rng *rand.Rand, nx, ny int) [][]Point {
 	return s
 }
 
+// comparePointSlices tests that two 2-D slices of morph.Points are the same
+// size and contain the same values.  It aborts if not.
+func comparePointSlices(t *testing.T, s1, s2 [][]Point) {
+	if len(s1) != len(s2) {
+		t.Fatalf("mismatched row counts (%d vs. %d)", len(s1), len(s2))
+	}
+	for j, row := range s1 {
+		if len(s1[j]) != len(s2[j]) {
+			t.Fatalf("mismatched column counts in row %d (%d vs. %d)", j, len(s1[j]), len(s2[j]))
+		}
+		for i := range row {
+			if s1[j][i] != s2[j][i] {
+				t.Fatalf("mismatched values at s[%d][%d]: %v vs. %v", j, i, s1[j][i], s2[j][i])
+			}
+		}
+	}
+}
+
 // TestMeshFromPoints ensures we can create meshes from various-sized
 // 2-D slices of morph.Points.
 func TestMeshFromPoints(t *testing.T) {
+	// Create a set of slices.
 	rng := rand.New(rand.NewSource(11))
-	s1 := random2DPoints(rng, 4, 4) // Minimal mesh size
-	m1 := MeshFromPoints(s1)
-	s2 := random2DPoints(rng, 101, 7) // Wide and short
-	m2 := MeshFromPoints(s2)
-	s3 := random2DPoints(rng, 7, 101) // Tall and narrow
-	m3 := MeshFromPoints(s3)
-	s4 := random2DPoints(rng, 3000, 3000) // Large
-	m4 := MeshFromPoints(s4)
-	_, _, _, _ = m1, m2, m3, m4
+	i1 := random2DPoints(rng, 4, 4)       // Minimal mesh size
+	i2 := random2DPoints(rng, 101, 7)     // Wide and short
+	i3 := random2DPoints(rng, 7, 101)     // Tall and narrow
+	i4 := random2DPoints(rng, 3000, 3000) // Large
+
+	// Convert slices to meshes.
+	m1 := MeshFromPoints(i1)
+	m2 := MeshFromPoints(i2)
+	m3 := MeshFromPoints(i3)
+	m4 := MeshFromPoints(i4)
+
+	// Convert meshes back to slices.
+	o1 := m1.Points()
+	o2 := m2.Points()
+	o3 := m3.Points()
+	o4 := m4.Points()
+
+	// Ensure the before and after slices match.
+	comparePointSlices(t, i1, o1)
+	comparePointSlices(t, i2, o2)
+	comparePointSlices(t, i3, o3)
+	comparePointSlices(t, i4, o4)
 }

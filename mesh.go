@@ -3,6 +3,7 @@
 package morph
 
 /*
+#include <stdlib.h>
 #include <xmorph/mesh.h>
 #include <xmorph/mesh_t.h>
 #cgo LDFLAGS: -lmorph
@@ -10,7 +11,7 @@ package morph
 import "C"
 import (
 	"image"
-	"runtime"
+	"io"
 	"unsafe"
 )
 
@@ -23,16 +24,13 @@ type Point struct {
 
 // A Mesh represents a 2-D mesh.
 type Mesh struct {
-	mesh C.MeshT // Underlying mesh representation
+	mesh *C.MeshT // Underlying mesh representation
 }
 
-// NewMesh creates a new mesh of given number of vertices.
+// NewMesh creates a new mesh of a given number of vertices.
 func NewMesh(nx, ny int) *Mesh {
 	m := &Mesh{}
-	C.meshAlloc(&m.mesh, C.int(nx), C.int(ny))
-	runtime.SetFinalizer(m, func(m *Mesh) {
-		C.meshUnref(&m.mesh)
-	})
+	m.mesh = C.meshNew(C.int(nx), C.int(ny))
 	return m
 }
 
@@ -67,6 +65,7 @@ func MeshFromPoints(s [][]Point) *Mesh {
 	}
 	return m
 }
+
 // MeshFromImagePoints creates a new mesh from a 2-D slice of image.Points.
 func MeshFromImagePoints(s [][]image.Point) *Mesh {
 	// Sanity check the mesh lest libmorph doesn't write something itself
@@ -97,4 +96,53 @@ func MeshFromImagePoints(s [][]image.Point) *Mesh {
 		}
 	}
 	return m
+}
+
+// Points converts a mesh to a 2-D slice of morph.Points.
+func (m *Mesh) Points() [][]Point {
+	// Represent the MeshT's flat lists of x and y values as Go slices.
+	nx, ny := int(m.mesh.nx), int(m.mesh.ny)
+	np := nx * ny
+	xp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.x))[:np:np]
+	yp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.y))[:np:np]
+
+	// Reshape the flat lists as a Go slice of slices.
+	s := make([][]Point, ny)
+	idx := 0
+	for j := range s {
+		s[j] = make([]Point, nx)
+		for i := range s[j] {
+			s[j][i].X = float64(xp[idx])
+			s[j][i].Y = float64(yp[idx])
+			idx++
+		}
+	}
+	return s
+}
+
+// ImagePoints converts a mesh to a 2-D slice of image.Points.
+func (m *Mesh) ImagePoints() [][]image.Point {
+	// Represent the MeshT's flat lists of x and y values as Go slices.
+	nx, ny := int(m.mesh.nx), int(m.mesh.ny)
+	np := nx * ny
+	xp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.x))[:np:np]
+	yp := (*[1 << 30]C.double)(unsafe.Pointer(m.mesh.y))[:np:np]
+
+	// Reshape the flat lists as a Go slice of slices.
+	s := make([][]image.Point, ny)
+	idx := 0
+	for j := range s {
+		s[j] = make([]image.Point, nx)
+		for i := range s[j] {
+			s[j][i].X = int(xp[idx])
+			s[j][i].Y = int(yp[idx])
+			idx++
+		}
+	}
+	return s
+}
+
+// Write outputs a mesh that's compatible with morph, xmorph, and gtkmorph.
+func (m *Mesh) Write(w io.Writer) error {
+	return nil // TODO: Write this function.
 }
