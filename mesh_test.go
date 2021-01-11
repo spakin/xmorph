@@ -229,10 +229,10 @@ func TestWrite(t *testing.T) {
 50 53 0
 <SIS>
 <orig>
-5 5
+6 7
 </orig>
 <rect>
-0 0 5 5
+0 0 5 6
 </rect>
 <eye>
 1.666667 1.750000
@@ -245,7 +245,7 @@ func TestWrite(t *testing.T) {
 </eye>
 </SIS>
 <resulting image size>
-5 5
+6 7
 </resulting image size>
 <features>
 <name>

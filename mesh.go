@@ -236,13 +236,13 @@ feature 2
 </name>
 </features>
 `,
-		math.Round(dx), math.Round(dy),
-		math.Round(ul.X), math.Round(ul.Y),
-		math.Round(lr.X), math.Round(lr.Y),
+		math.Ceil(dx+1), math.Ceil(dy+1),
+		math.Floor(ul.X), math.Floor(ul.Y),
+		math.Ceil(lr.X), math.Ceil(lr.Y),
 		eye1.X, eye1.Y,
 		eye2.X, eye2.Y,
 		eye3.X, eye3.Y,
-		math.Round(dx), math.Round(dy))
+		math.Ceil(dx+1), math.Ceil(dy+1))
 	if err != nil {
 		return err
 	}
