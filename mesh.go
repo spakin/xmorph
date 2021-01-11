@@ -248,3 +248,44 @@ feature 2
 	}
 	return nil
 }
+
+// checkMeshCoord panics if a given coordinate lies out of range.
+func (m *Mesh) checkMeshCoord(x, y int) {
+	cx, cy := C.int(x), C.int(y)
+	if cx < 0 || cy < 0 || C.long(cx) >= m.mesh.nx || C.long(cy) >= m.mesh.ny {
+		panic(fmt.Sprintf("point (%d, %d) lies of out bounds of the mesh", x, y))
+	}
+}
+
+// Get returns the morph.Point at (x, y).
+func (m *Mesh) Get(x, y int) Point {
+	m.checkMeshCoord(x, y)
+	cx, cy := C.int(x), C.int(y)
+	var pt Point
+	pt.X = float64(C.meshGetx(m.mesh, cx, cy))
+	pt.Y = float64(C.meshGety(m.mesh, cx, cy))
+	return pt
+}
+
+// GetImagePoint returns the image.Point at (x, y).
+func (m *Mesh) GetImagePoint(x, y int) image.Point {
+	pt := m.Get(x, y)
+	return image.Point{
+		X: int(pt.X),
+		Y: int(pt.Y),
+	}
+}
+
+// Set assigns the morph.Point at (x, y).
+func (m *Mesh) Set(x, y int, pt Point) {
+	m.checkMeshCoord(x, y)
+	cx, cy := C.int(x), C.int(y)
+	C.meshSetNoundo(m.mesh, cx, cy, C.double(pt.X), C.double(pt.Y))
+}
+
+// SetImagePoint assigns the image.Point at (x, y).
+func (m *Mesh) SetImagePoint(x, y int, pt image.Point) {
+	m.checkMeshCoord(x, y)
+	cx, cy := C.int(x), C.int(y)
+	C.meshSetNoundo(m.mesh, cx, cy, C.double(pt.X), C.double(pt.Y))
+}

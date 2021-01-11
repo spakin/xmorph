@@ -73,7 +73,7 @@ func comparePointSlices(t *testing.T, s1, s2 [][]Point) {
 // 2-D slices of morph.Points.
 func TestMeshFromPoints(t *testing.T) {
 	// Create a set of slices.
-	rng := rand.New(rand.NewSource(22))
+	rng := rand.New(rand.NewSource(11))
 	i1 := random2DPoints(rng, 4, 4)       // Minimal mesh size
 	i2 := random2DPoints(rng, 101, 7)     // Wide and short
 	i3 := random2DPoints(rng, 7, 101)     // Tall and narrow
@@ -155,7 +155,7 @@ func compareImagePointSlices(t *testing.T, s1, s2 [][]image.Point) {
 // 2-D slices of image.Points.
 func TestMeshFromImagePoints(t *testing.T) {
 	// Create a set of slices.
-	rng := rand.New(rand.NewSource(11))
+	rng := rand.New(rand.NewSource(22))
 	i1 := random2DImagePoints(rng, 4, 4)       // Minimal mesh size
 	i2 := random2DImagePoints(rng, 101, 7)     // Wide and short
 	i3 := random2DImagePoints(rng, 7, 101)     // Tall and narrow
@@ -263,5 +263,84 @@ feature 2
 	if actual != expected {
 		t.Logf(actual)
 		t.Fatalf("unexpected output (expected %d bytes; observed %d bytes)", len(expected), len(actual))
+	}
+}
+
+// TestMeshGetSet ensures we can get and set mesh points.
+func TestMeshGetSet(t *testing.T) {
+	// Set mesh points to arbitrary values.  We do so in column-major order
+	// so the underlying vectors are not written in linear fashion.
+	const (
+		nx  = 11
+		ny  = 10
+		inc = 1.625
+	)
+	m := NewMesh(nx, ny)
+	idx := 1.0
+	for i := 0; i < nx; i++ {
+		for j := 0; j < ny; j++ {
+			var pt Point
+			pt.X = idx
+			idx += inc
+			pt.Y = idx
+			idx += inc
+			m.Set(i, j, pt)
+		}
+	}
+
+	// Read back all values previously written.
+	idx = 1.0
+	for i := 0; i < nx; i++ {
+		for j := 0; j < ny; j++ {
+			var pt Point
+			pt.X = idx
+			idx += inc
+			pt.Y = idx
+			idx += inc
+			mpt := m.Get(i, j)
+			if mpt != pt {
+				t.Fatalf("wrote %v to (%d, %d) but read back %v", pt, i, j, mpt)
+			}
+		}
+	}
+}
+
+// TestMeshGetSetImage ensures we can get and set mesh points as image.Point
+// values.
+func TestMeshGetSetImage(t *testing.T) {
+	// Set mesh points to arbitrary values.  We do so in column-major order
+	// so the underlying vectors are not written in linear fashion.
+	const (
+		nx  = 10
+		ny  = 11
+		inc = 3
+	)
+	m := NewMesh(nx, ny)
+	idx := 1
+	for i := 0; i < nx; i++ {
+		for j := 0; j < ny; j++ {
+			var pt image.Point
+			pt.X = idx
+			idx += inc
+			pt.Y = idx
+			idx += inc
+			m.SetImagePoint(i, j, pt)
+		}
+	}
+
+	// Read back all values previously written.
+	idx = 1.0
+	for i := 0; i < nx; i++ {
+		for j := 0; j < ny; j++ {
+			var pt image.Point
+			pt.X = idx
+			idx += inc
+			pt.Y = idx
+			idx += inc
+			mpt := m.GetImagePoint(i, j)
+			if mpt != pt {
+				t.Fatalf("wrote %v to (%d, %d) but read back %v", pt, i, j, mpt)
+			}
+		}
 	}
 }
