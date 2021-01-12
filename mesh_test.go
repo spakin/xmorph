@@ -1,4 +1,4 @@
-// The functions defined in this file ensure the morph package's test
+// The functions defined in this file ensure the morph package's Mesh
 // operations work as expected.
 
 package morph

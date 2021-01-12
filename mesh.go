@@ -18,13 +18,6 @@ import (
 	"unsafe"
 )
 
-// A Point is a float64-valued (x, y) coordinate.  The axes increase right and
-// down.
-type Point struct {
-	X float64
-	Y float64
-}
-
 // A Mesh represents a 2-D mesh.
 type Mesh struct {
 	mesh *C.MeshT // Underlying mesh representation
