@@ -20,14 +20,18 @@ import (
 
 // A Mesh represents a 2-D mesh.
 type Mesh struct {
+	NX   int      // Number of mesh points in the x direction
+	NY   int      // Number of mesh points in the y direction
 	mesh *C.MeshT // Underlying mesh representation
 }
 
 // NewMesh creates a new mesh of a given number of vertices.
 func NewMesh(nx, ny int) *Mesh {
-	m := &Mesh{}
-	m.mesh = C.meshNew(C.int(nx), C.int(ny))
-	return m
+	return &Mesh{
+		NX:   nx,
+		NY:   ny,
+		mesh: C.meshNew(C.int(nx), C.int(ny)),
+	}
 }
 
 // Free deallocates the mesh memory managed by libmorph.

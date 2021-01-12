@@ -470,6 +470,17 @@ func TestFunctionalize(t *testing.T) {
 	}
 }
 
+// validateMeshDimens checks that a Mesh has the expected dimensions and that
+// these are consistent across the C and Go versions.
+func validateMeshDimens(t *testing.T, m *Mesh, wd, ht int) {
+	if int(m.mesh.nx) != m.NX || int(m.mesh.ny) != m.NY {
+		t.Fatalf("inconsistent mesh dimensions (%d, %d) in Go vs. (%d, %d) from C", m.NX, m.NY, int(m.mesh.nx), int(m.mesh.ny))
+	}
+	if m.NX != wd || m.NY != ht {
+		t.Fatalf("invalid mesh dimensions: expected (%d, %d) but saw (%d, %d)", wd, ht, m.NX, m.NY)
+	}
+}
+
 // TestCopy ensures we can deep-copy a mesh.
 func TestCopy(t *testing.T) {
 	// Ensure that no data changes during a copy.
@@ -488,7 +499,13 @@ func TestCopy(t *testing.T) {
 		}
 	}
 
-	// Now ensure that the copy was deep.  If we change an element in the
+	// Ensure that the NX and NY fields were copied, too.  We also confirm
+	// that they were assigned correctly to begin with because we don't
+	// currently have a separate test for that.
+	validateMeshDimens(t, m1, wd, ht)
+	validateMeshDimens(t, m2, wd, ht)
+
+	// Ensure that the copy was deep.  If we change an element in the
 	// source, it should not change in the target.
 	cx, cy := wd/2, ht/2
 	vOld := m1.Get(cx, cy)
@@ -549,6 +566,11 @@ func TestInterpolate(t *testing.T) {
 		t.Fatal(err)
 	}
 	sli := mi.Points()
+
+	// Ensure all meshes have the same dimensions.
+	validateMeshDimens(t, m1, wd, ht)
+	validateMeshDimens(t, m2, wd, ht)
+	validateMeshDimens(t, mi, wd, ht)
 
 	// Check the results.
 	for r := 0; r < ht; r++ {
