@@ -361,7 +361,29 @@ func (m *Mesh) SetImagePoint(x, y int, pt image.Point) {
 // Functionalize fixes problems with the mesh, making it both functional and
 // bounded.  It takes as input the width and height of the image to which the
 // mesh corresponds and returns the number of changes made.
-func (m *Mesh) Functionalize(w,h int) int {
+func (m *Mesh) Functionalize(w, h int) int {
 	nc := C.meshFunctionalize(m.mesh, C.int(w), C.int(h))
 	return int(nc)
+}
+
+// Copy deep-copies a mesh.
+func (m *Mesh) Copy() *Mesh {
+	mc := NewMesh(int(m.mesh.nx), int(m.mesh.ny))
+	C.meshCopy(mc.mesh, m.mesh)
+	return mc
+}
+
+// InterpolateMeshes interpolates two meshes to produce a new mesh that lies a
+// given fraction from the first mesh's points to the second mesh's points.  It
+// returns an error code if the meshes are incompatible.
+func InterpolateMeshes(m1, m2 *Mesh, t float64) (*Mesh, error) {
+	if t < 0.0 || t > 1.0 {
+		return nil, fmt.Errorf("interpolation fraction %.5g does not lie in the range [0.0, 1.0]", t)
+	}
+	if C.meshCompatibilityCheck(m1.mesh, m2.mesh) != 0 {
+		return nil, fmt.Errorf("incompatible meshes passed to InterpolateMeshes")
+	}
+	m := m1.Copy()
+	C.meshInterpolate(m.mesh, m1.mesh, m2.mesh, C.double(t))
+	return m, nil
 }

@@ -469,3 +469,108 @@ func TestFunctionalize(t *testing.T) {
 		t.Fatalf("expected functionalization to fix %d points, but it fixed %d", expected, actual)
 	}
 }
+
+// TestCopy ensures we can deep-copy a mesh.
+func TestCopy(t *testing.T) {
+	// Ensure that no data changes during a copy.
+	rng := rand.New(rand.NewSource(55))
+	const wd, ht = 25, 25
+	sl := random2DPoints(rng, wd, ht)
+	m1 := MeshFromPoints(sl)
+	m2 := m1.Copy()
+	for j := 0; j < ht; j++ {
+		for i := 0; i < wd; i++ {
+			pt1 := m1.Get(i, j)
+			pt2 := m2.Get(i, j)
+			if pt1 != pt2 {
+				t.Fatalf("mismatch at (%d, %d): expected %v but saw %v", i, j, pt1, pt2)
+			}
+		}
+	}
+
+	// Now ensure that the copy was deep.  If we change an element in the
+	// source, it should not change in the target.
+	cx, cy := wd/2, ht/2
+	vOld := m1.Get(cx, cy)
+	vNew := Point{X: vOld.X * 2, Y: vOld.Y * 2}
+	m1.Set(cx, cy, vNew)
+	for j := 0; j < ht; j++ {
+		for i := 0; i < wd; i++ {
+			pt1 := m1.Get(i, j)
+			pt2 := m2.Get(i, j)
+			if pt1 != pt2 && (i != cx || j != cy) {
+				t.Fatalf("mismatch at (%d, %d): expected %v but saw %v", i, j, pt1, pt2)
+			}
+			if pt1 == pt2 && i == cx && j == cy {
+				t.Fatalf("unexpected match at (%d, %d): expected %v and %v but saw only %v",
+					i, j, vOld, vNew, pt1)
+			}
+		}
+	}
+}
+
+// TestInterpolate ensures we can interpolate two meshes.
+func TestInterpolate(t *testing.T) {
+	// Create two meshes: One regular and one with all internal points
+	// scaled downwards.
+	const wd, ht = 10, 8
+	const scale = 0.25
+	const interp = 0.6
+	sl1 := make([][]Point, ht)
+	for r := range sl1 {
+		row := make([]Point, wd)
+		for c := range row {
+			row[c] = Point{
+				X: float64(c * 100),
+				Y: float64(r * 100),
+			}
+		}
+		sl1[r] = row
+	}
+	m1 := MeshFromPoints(sl1)
+	sl2 := make([][]Point, ht)
+	for r := 0; r < ht; r++ {
+		sl2[r] = make([]Point, wd)
+		if r == 0 || r == ht-1 {
+			copy(sl2[r], sl1[r])
+			continue
+		}
+		sl2[r][0] = sl1[r][0]
+		for c := 1; c < wd-1; c++ {
+			sl2[r][c].X = sl1[r][c].X * scale
+			sl2[r][c].Y = sl1[r][c].Y * scale
+		}
+		sl2[r][wd-1] = sl1[r][wd-1]
+	}
+	m2 := MeshFromPoints(sl2)
+
+	// Interpolate the two meshes.
+	mi, err := InterpolateMeshes(m1, m2, interp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sli := mi.Points()
+
+	// Check the results.
+	for r := 0; r < ht; r++ {
+		for c := 0; c < wd; c++ {
+			var expected Point
+			if r == 0 || r == ht-1 || c == 0 || c == wd-1 {
+				// Edges should be unmodified.
+				expected = sl1[r][c]
+			} else {
+				// Edges should be interpolated.
+				pt1 := sl1[r][c]
+				pt2 := sl2[r][c]
+				expected = Point{
+					X: pt1.X*(1.0-interp) + pt2.X*interp,
+					Y: pt1.Y*(1.0-interp) + pt2.Y*interp,
+				}
+			}
+			actual := sli[r][c]
+			if expected != actual {
+				t.Fatalf("failed interpolation at (%d, %d): expected %v but saw %v", c, r, expected, actual)
+			}
+		}
+	}
+}
