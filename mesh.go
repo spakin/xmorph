@@ -357,3 +357,11 @@ func (m *Mesh) SetImagePoint(x, y int, pt image.Point) {
 	cx, cy := C.int(x), C.int(y)
 	C.meshSetNoundo(m.mesh, cx, cy, C.double(pt.X), C.double(pt.Y))
 }
+
+// Functionalize fixes problems with the mesh, making it both functional and
+// bounded.  It takes as input the width and height of the image to which the
+// mesh corresponds and returns the number of changes made.
+func (m *Mesh) Functionalize(w,h int) int {
+	nc := C.meshFunctionalize(m.mesh, C.int(w), C.int(h))
+	return int(nc)
+}

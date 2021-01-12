@@ -443,3 +443,29 @@ func TestMeshGetSetImage(t *testing.T) {
 		}
 	}
 }
+
+// TestFunctionalize ensures we can functionalize a mesh.
+func TestFunctionalize(t *testing.T) {
+	// Test a slice containing completely random coordinates.
+	// (random2DPoints is too structures for this test.)
+	const mwd, mht = 8, 6   // Mesh width and height
+	const wd, ht = 800, 600 // Image width and height
+	rng := rand.New(rand.NewSource(44))
+	sl := make([][]Point, mht)
+	for r := range sl {
+		row := make([]Point, mwd)
+		for c := range row {
+			row[c] = Point{
+				X: rng.Float64() * wd,
+				Y: rng.Float64() * ht,
+			}
+		}
+		sl[r] = row
+	}
+	m := MeshFromPoints(sl)
+	const expected = 12 // Empirically determined
+	actual := m.Functionalize(wd, ht)
+	if actual != expected {
+		t.Fatalf("expected functionalization to fix %d points, but it fixed %d", expected, actual)
+	}
+}
