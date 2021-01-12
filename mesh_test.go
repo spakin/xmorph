@@ -492,7 +492,7 @@ func TestCopy(t *testing.T) {
 	// source, it should not change in the target.
 	cx, cy := wd/2, ht/2
 	vOld := m1.Get(cx, cy)
-	vNew := Point{X: vOld.X * 2, Y: vOld.Y * 2}
+	vNew := vOld.Mul(2.0)
 	m1.Set(cx, cy, vNew)
 	for j := 0; j < ht; j++ {
 		for i := 0; i < wd; i++ {
@@ -537,8 +537,7 @@ func TestInterpolate(t *testing.T) {
 		}
 		sl2[r][0] = sl1[r][0]
 		for c := 1; c < wd-1; c++ {
-			sl2[r][c].X = sl1[r][c].X * scale
-			sl2[r][c].Y = sl1[r][c].Y * scale
+			sl2[r][c] = sl1[r][c].Mul(scale)
 		}
 		sl2[r][wd-1] = sl1[r][wd-1]
 	}
@@ -562,10 +561,7 @@ func TestInterpolate(t *testing.T) {
 				// Edges should be interpolated.
 				pt1 := sl1[r][c]
 				pt2 := sl2[r][c]
-				expected = Point{
-					X: pt1.X*(1.0-interp) + pt2.X*interp,
-					Y: pt1.Y*(1.0-interp) + pt2.Y*interp,
-				}
+				expected = pt1.Mul(1.0 - interp).Add(pt2.Mul(interp))
 			}
 			actual := sli[r][c]
 			if expected != actual {
