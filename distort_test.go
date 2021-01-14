@@ -298,3 +298,23 @@ func TestWarpAlpha(t *testing.T) {
 	hash := imageHash(t, warp)
 	compareHashes(t, exp, hash)
 }
+
+// TestWarpCMYK tests that an CMYK image can be warped according to a source
+// and destination mesh.
+func TestWarpCMYK(t *testing.T) {
+	// Warp the image.
+	img := image.NewCMYK(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x19, 0x27, 0x24, 0x5e, 0xbe, 0xac, 0xfb, 0x72, 0xf9,
+		0xe7, 0x1e, 0xd1, 0x72, 0x28, 0x44, 0x87, 0x66, 0x1, 0xb5,
+		0x45, 0x37, 0x4c, 0xfe, 0x73, 0xb5, 0xeb, 0xf9, 0xb4, 0x81,
+		0xdc, 0x87, 0x9f}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+}
