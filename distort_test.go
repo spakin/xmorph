@@ -4,12 +4,14 @@
 package morph
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"image"
 	"strings"
 	"testing"
 
 	"image/color"
+	"image/png"
 	_ "image/png"
 )
 
@@ -234,13 +236,65 @@ func copyGopherImage(cm color.Model, set func(x, y int, c color.Color)) {
 	}
 }
 
-// TestWarpNRGBA tests that an NRGBA image can be warped according to a source
-// and destination mesh.
-func TestWarpNRGBA(t *testing.T) {
-	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
-	_, err := Warp(img, gopherMeshIn, gopherMeshOut)
+// imageHash computes a SHA256 hash of an image.
+func imageHash(t *testing.T, img image.Image) []byte {
+	hash := sha256.New()
+	err := png.Encode(hash, img)
 	if err != nil {
 		t.Fatal(err)
 	}
+	return hash.Sum(nil)
+}
+
+// compareHashes returns an error if an expected hash and an actual hash are
+// not equal.
+func compareHashes(t *testing.T, h1, h2 []byte) {
+	if len(h1) != len(h2) {
+		t.Fatalf("hashes are of different lengths: %v vs. %v", h1, h2)
+	}
+	for i := range h1 {
+		if h1[i] != h2[i] {
+			t.Fatalf("hash mismatch: expected %v but saw %v", h1, h2)
+		}
+	}
+}
+
+// TestWarpNRGBA tests that an NRGBA image can be warped according to a source
+// and destination mesh.
+func TestWarpNRGBA(t *testing.T) {
+	// Warp the image.
+	img := image.NewNRGBA(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x8e, 0x5e, 0x2c, 0x5d, 0x74, 0xdb, 0xcd, 0x37, 0xd0,
+		0x8c, 0xdc, 0x33, 0x8d, 0xe2, 0x7d, 0x27, 0x9a, 0xd9, 0x6e,
+		0xb6, 0xfc, 0x95, 0xeb, 0x99, 0xc4, 0xc2, 0xcb, 0x64, 0x2e,
+		0x20, 0xad, 0xf2}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+}
+
+// TestWarpAlpha tests that an Alpha image can be warped according to a source
+// and destination mesh.
+func TestWarpAlpha(t *testing.T) {
+	// Warp the image.
+	img := image.NewAlpha(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x41, 0x3f, 0x79, 0x1a, 0xfc, 0x1e, 0x2a, 0x4a, 0x8c,
+		0x2, 0xe5, 0x25, 0x6b, 0x71, 0x67, 0xa0, 0xe7, 0xc5, 0x2a,
+		0x26, 0x6b, 0x62, 0x16, 0xb9, 0xcd, 0x6d, 0xeb, 0xe5, 0x18,
+		0x40, 0x5f, 0x64}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
 }
