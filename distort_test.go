@@ -353,3 +353,23 @@ func TestWarpGray(t *testing.T) {
 	hash := imageHash(t, warp)
 	compareHashes(t, exp, hash)
 }
+
+// TestWarpRGBA tests that an RGBA image can be warped according to a source
+// and destination mesh.
+func TestWarpRGBA(t *testing.T) {
+	// Warp the image.
+	img := image.NewRGBA(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0xba, 0x23, 0xcf, 0x24, 0x68, 0x3d, 0xb, 0x7c, 0x5b,
+		0x3c, 0x5, 0x5b, 0xb9, 0xcb, 0x5b, 0x8c, 0x35, 0x71, 0xee,
+		0xac, 0x33, 0x30, 0x7d, 0x18, 0x1f, 0x87, 0xa5, 0xa1, 0x4a,
+		0x68, 0x7e, 0xc0}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+}

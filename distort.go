@@ -73,12 +73,24 @@ func warpGray(img *image.Gray, src, dst *Mesh) *image.Gray {
 	}
 }
 
+// warpRGBA warps an RGBA image.
+func warpRGBA(img *image.RGBA, src, dst *Mesh) *image.RGBA {
+	out := warpUint8Slice(img.Pix, img.Stride, 4, img.Rect, src, dst)
+	return &image.RGBA{
+		Pix:    out,
+		Stride: img.Stride,
+		Rect:   img.Rect,
+	}
+}
+
 // Warp distorts an image by warping an input mesh to an output mesh.
 func Warp(img image.Image, src, dst *Mesh) (image.Image, error) {
 	if C.meshCompatibilityCheck(src.mesh, dst.mesh) != 0 {
 		return nil, fmt.Errorf("incompatible meshes passed to InterpolateMeshes")
 	}
 	switch img := img.(type) {
+	case *image.RGBA:
+		return warpRGBA(img, src, dst), nil
 	case *image.NRGBA:
 		return warpNRGBA(img, src, dst), nil
 	case *image.Gray:
