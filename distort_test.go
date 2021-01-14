@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"image"
+	"os"
 	"strings"
 	"testing"
 
@@ -259,6 +260,20 @@ func compareHashes(t *testing.T, h1, h2 []byte) {
 	}
 }
 
+// writePNG writes an image to a PNG file.  This function can be used to
+// validate visually a generated image.
+func writePNG(fn string, img image.Image) {
+	f, err := os.Create(fn)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	err = png.Encode(f, img)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // TestWarpNRGBA tests that an NRGBA image can be warped according to a source
 // and destination mesh.
 func TestWarpNRGBA(t *testing.T) {
@@ -299,7 +314,7 @@ func TestWarpAlpha(t *testing.T) {
 	compareHashes(t, exp, hash)
 }
 
-// TestWarpCMYK tests that an CMYK image can be warped according to a source
+// TestWarpCMYK tests that a CMYK image can be warped according to a source
 // and destination mesh.
 func TestWarpCMYK(t *testing.T) {
 	// Warp the image.
@@ -315,6 +330,26 @@ func TestWarpCMYK(t *testing.T) {
 		0xe7, 0x1e, 0xd1, 0x72, 0x28, 0x44, 0x87, 0x66, 0x1, 0xb5,
 		0x45, 0x37, 0x4c, 0xfe, 0x73, 0xb5, 0xeb, 0xf9, 0xb4, 0x81,
 		0xdc, 0x87, 0x9f}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+}
+
+// TestWarpGray tests that a Gray image can be warped according to a source
+// and destination mesh.
+func TestWarpGray(t *testing.T) {
+	// Warp the image.
+	img := image.NewGray(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0xf5, 0x6b, 0x26, 0xf3, 0xb4, 0x2e, 0xc9, 0xff, 0xf6,
+		0x82, 0xd8, 0xa7, 0xa2, 0xc8, 0xae, 0x9a, 0x19, 0x50, 0x70,
+		0xd1, 0x81, 0xc6, 0x8e, 0x11, 0xe4, 0xb3, 0xc5, 0x53, 0x3f,
+		0x3f, 0xb1, 0x4e}
 	hash := imageHash(t, warp)
 	compareHashes(t, exp, hash)
 }

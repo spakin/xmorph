@@ -53,10 +53,20 @@ func warpNRGBA(img *image.NRGBA, src, dst *Mesh) *image.NRGBA {
 	}
 }
 
-// warpCMYK warps an CMYK image.
+// warpCMYK warps a CMYK image.
 func warpCMYK(img *image.CMYK, src, dst *Mesh) *image.CMYK {
 	out := warpUint8Slice(img.Pix, img.Stride, 4, img.Rect, src, dst)
 	return &image.CMYK{
+		Pix:    out,
+		Stride: img.Stride,
+		Rect:   img.Rect,
+	}
+}
+
+// warpGray warps a Gray image.
+func warpGray(img *image.Gray, src, dst *Mesh) *image.Gray {
+	out := warpUint8Slice(img.Pix, img.Stride, 1, img.Rect, src, dst)
+	return &image.Gray{
 		Pix:    out,
 		Stride: img.Stride,
 		Rect:   img.Rect,
@@ -71,6 +81,8 @@ func Warp(img image.Image, src, dst *Mesh) (image.Image, error) {
 	switch img := img.(type) {
 	case *image.NRGBA:
 		return warpNRGBA(img, src, dst), nil
+	case *image.Gray:
+		return warpGray(img, src, dst), nil
 	case *image.CMYK:
 		return warpCMYK(img, src, dst), nil
 	case *image.Alpha:
