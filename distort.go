@@ -6,6 +6,7 @@ package morph
 #include <xmorph/mesh.h>
 #include <xmorph/mesh_t.h>
 #include <xmorph/warp2.h>
+#include <xmorph/resample.h>
 */
 import "C"
 import (
@@ -13,9 +14,28 @@ import (
 	"image"
 )
 
+// AAKernel indicates the type of antialiasing to perform.
+type AAKernel int
+
+// These are the values that an AAKernel variable can accept.
+const (
+	NearNeighbor AAKernel = iota // No antialiasing.  Fastest.
+	Bilinear
+	Lanczos
+	Lanczos4 // Best antialiasing.  Slowest.
+)
+
+// Antialiasing indicates the type of antialiasing to perform when warping an
+// image.
+var Antialiasing = Lanczos
+
 // warpUint8Slice warps any image type that's representable as a slice of
 // alternating channel values, each of which is of type uint8.
 func warpUint8Slice(pix []uint8, ystr, nchan int, bnds image.Rectangle, src, dst *Mesh) []uint8 {
+	// Select an antialiasing kernel.
+	C.mesh_resample_choose_aa(C.int(Antialiasing))
+
+	// Warp the image.
 	wd := bnds.Max.X - bnds.Min.X
 	ht := bnds.Max.Y - bnds.Min.Y
 	out := make([]uint8, len(pix))
