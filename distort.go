@@ -19,7 +19,7 @@ type AAKernel int
 
 // These are the values that an AAKernel variable can accept.
 const (
-	NearNeighbor AAKernel = iota // No antialiasing.  Fastest.
+	NearestNeighbor AAKernel = iota // No antialiasing.  Fastest.
 	Bilinear
 	Lanczos
 	Lanczos4 // Best antialiasing.  Slowest.

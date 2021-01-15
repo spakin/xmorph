@@ -473,3 +473,84 @@ func TestWarp66NRGBA(t *testing.T) {
 	hash := imageHash(t, warp)
 	compareHashes(t, exp, hash)
 }
+
+// TestWarpNRGBANN tests that an NRGBA image can be warped according to a
+// source and destination mesh and using nearest-neighbor interpolation instead
+// of Lanczos-based antialiasing.
+func TestWarpNRGBANN(t *testing.T) {
+	// Select the antialiasing kernel.
+	Antialiasing = NearestNeighbor
+
+	// Warp the image.
+	img := image.NewNRGBA(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0xef, 0x55, 0xfb, 0xa6, 0x26, 0x66, 0x8b, 0xed, 0xbe,
+		0x4c, 0x1d, 0xbc, 0x77, 0xbd, 0x8e, 0xe1, 0xf8, 0xab, 0x99,
+		0x14, 0x15, 0x93, 0x10, 0x90, 0x2c, 0xa9, 0xf6, 0x3c, 0xdc,
+		0xf5, 0xff, 0xc}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+
+	// Restore the default Lanczos antialiasing.
+	Antialiasing = Lanczos
+}
+
+// TestWarpNRGBABilinear tests that an NRGBA image can be warped according to a
+// source and destination mesh and using bilinear interpolation instead of
+// Lanczos-based antialiasing.
+func TestWarpNRGBABilinear(t *testing.T) {
+	// Select the antialiasing kernel.
+	Antialiasing = Bilinear
+
+	// Warp the image.
+	img := image.NewNRGBA(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x22, 0x18, 0x81, 0x63, 0x6c, 0x17, 0x7d, 0x63, 0x5d,
+		0x64, 0xd8, 0xa8, 0xd5, 0xf2, 0x4, 0x7, 0x8a, 0x8d, 0xee,
+		0x63, 0x71, 0x7, 0x41, 0xf, 0xff, 0xd5, 0xef, 0xdd, 0x46,
+		0xa9, 0x4b, 0x89}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+
+	// Restore the default Lanczos antialiasing.
+	Antialiasing = Lanczos
+}
+
+// TestWarpNRGBALanczos4 tests that an NRGBA image can be warped according to a
+// source and destination mesh and using the higher-quality Lanczos-based
+// antialiasing.
+func TestWarpNRGBALanczos4(t *testing.T) {
+	// Select the antialiasing kernel.
+	Antialiasing = Lanczos4
+
+	// Warp the image.
+	img := image.NewNRGBA(gopherImage.Bounds())
+	copyGopherImage(img.ColorModel(), img.Set)
+	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x29, 0x8b, 0xa, 0xe8, 0x30, 0xee, 0xa5, 0x5e, 0xba,
+		0xb9, 0xb3, 0x96, 0x49, 0x10, 0xdd, 0xa3, 0x30, 0x0, 0xc3,
+		0xb6, 0x33, 0xb3, 0xdb, 0xb9, 0xc4, 0xc, 0x47, 0x43, 0x51,
+		0x31, 0xac, 0xc9}
+	hash := imageHash(t, warp)
+	compareHashes(t, exp, hash)
+
+	// Restore the default Lanczos antialiasing.
+	Antialiasing = Lanczos
+}
