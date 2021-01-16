@@ -876,3 +876,25 @@ func TestMorph50CMYK(t *testing.T) {
 	hash := imageHash(t, morph)
 	compareHashes(t, exp, hash)
 }
+
+// TestMorph50Alpha tests that morphing an Alpha image 50% of the way to a
+// destination image produces the expected output.
+func TestMorph50Alpha(t *testing.T) {
+	// Morph the image.
+	sImg := image.NewAlpha(blueGopherImage.Bounds())
+	copyImage(sImg.ColorModel(), sImg.Set, blueGopherImage)
+	dImg := image.NewAlpha(plushGopherImage.Bounds())
+	copyImage(dImg.ColorModel(), dImg.Set, plushGopherImage)
+	morph, err := Morph(sImg, dImg, blueGopherMesh, plushGopherMesh, 0.5)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0xa0, 0x79, 0xce, 0xf2, 0x65, 0x3f, 0xbd, 0x2b, 0x9f,
+		0x3, 0x1e, 0x7e, 0x5a, 0x91, 0x4b, 0x73, 0x37, 0xdd, 0x94,
+		0x39, 0x12, 0xfc, 0x59, 0x1, 0xa4, 0x5f, 0x94, 0x31, 0x1f,
+		0x18, 0x9f, 0x7f}
+	hash := imageHash(t, morph)
+	compareHashes(t, exp, hash)
+}

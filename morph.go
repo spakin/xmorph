@@ -113,6 +113,36 @@ func morphCMYK(sImg, dImg *image.CMYK, sMesh, dMesh *Mesh, t float64) (*image.CM
 	return img, nil
 }
 
+// morphAlpha morphs an Alpha image.
+func morphAlpha(sImg, dImg *image.Alpha, sMesh, dMesh *Mesh, t float64) (*image.Alpha, error) {
+	// Separately warp the source and destination images.
+	sw, err := Warp(sImg, sMesh, dMesh, t)
+	if err != nil {
+		return nil, err
+	}
+	dw, err := Warp(dImg, sMesh, dMesh, 1.0-t)
+	if err != nil {
+		return nil, err
+	}
+	sWarp, dWarp := sw.(*image.Alpha), dw.(*image.Alpha)
+
+	// Perform a weighted average of the source and destination images'
+	// colors to produce a final image.
+	bnds := sWarp.Bounds()
+	img := image.NewAlpha(bnds)
+	for y := bnds.Min.Y; y < bnds.Max.Y; y++ {
+		for x := bnds.Min.X; x < bnds.Max.X; x++ {
+			cs := sWarp.AlphaAt(x, y)
+			cd := dWarp.AlphaAt(x, y)
+			c := color.Alpha{
+				A: avgU8(cs.A, cd.A, t),
+			}
+			img.SetAlpha(x, y, c)
+		}
+	}
+	return img, nil
+}
+
 // Morph morphs one image to another by warping an input mesh some fraction of
 // the way to an output mesh.
 func Morph(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (image.Image, error) {
@@ -128,6 +158,9 @@ func Morph(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (image.Image, 
 			sMesh, dMesh, t)
 	case *image.CMYK:
 		return morphCMYK(sImg.(*image.CMYK), dImg.(*image.CMYK),
+			sMesh, dMesh, t)
+	case *image.Alpha:
+		return morphAlpha(sImg.(*image.Alpha), dImg.(*image.Alpha),
 			sMesh, dMesh, t)
 	default:
 		panic(fmt.Sprintf("morphing from %T to %T is not yet implemented", sImg, dImg)) // TODO: implement
