@@ -723,6 +723,28 @@ func init() {
 	}
 }
 
+// TestMorph0NRGBA tests that morphing an NRGBA image 0% of the way to a
+// destination image produces the expected output.
+func TestMorph0NRGBA(t *testing.T) {
+	// Morph the image.
+	sImg := image.NewNRGBA(blueGopherImage.Bounds())
+	copyImage(sImg.ColorModel(), sImg.Set, blueGopherImage)
+	dImg := image.NewNRGBA(plushGopherImage.Bounds())
+	copyImage(dImg.ColorModel(), dImg.Set, plushGopherImage)
+	morph, err := Morph(sImg, dImg, blueGopherMesh, plushGopherMesh, 0.0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0xb9, 0xa3, 0xe7, 0xc6, 0x0, 0xfc, 0xc9, 0xd1, 0x5c,
+		0xa0, 0xfe, 0x78, 0x1d, 0x25, 0xc2, 0xc0, 0x47, 0x9b, 0xf6,
+		0x68, 0x88, 0x39, 0xe, 0x36, 0xad, 0xa0, 0xe1, 0x8d, 0xfa,
+		0x8e, 0xa2, 0x57}
+	hash := imageHash(t, morph)
+	compareHashes(t, exp, hash)
+}
+
 // TestMorph25NRGBA tests that morphing an NRGBA image 25% of the way to a
 // destination image produces the expected output.
 func TestMorph25NRGBA(t *testing.T) {
@@ -741,6 +763,72 @@ func TestMorph25NRGBA(t *testing.T) {
 		0x45, 0xe0, 0x4f, 0x1d, 0x92, 0x96, 0x67, 0xb, 0x29, 0x36,
 		0xbf, 0x7f, 0xd7, 0x64, 0xee, 0x7b, 0x8f, 0x0, 0x5f, 0x7d,
 		0x26, 0x18, 0x68}
+	hash := imageHash(t, morph)
+	compareHashes(t, exp, hash)
+}
+
+// TestMorph50NRGBA tests that morphing an NRGBA image 50% of the way to a
+// destination image produces the expected output.
+func TestMorph50NRGBA(t *testing.T) {
+	// Morph the image.
+	sImg := image.NewNRGBA(blueGopherImage.Bounds())
+	copyImage(sImg.ColorModel(), sImg.Set, blueGopherImage)
+	dImg := image.NewNRGBA(plushGopherImage.Bounds())
+	copyImage(dImg.ColorModel(), dImg.Set, plushGopherImage)
+	morph, err := Morph(sImg, dImg, blueGopherMesh, plushGopherMesh, 0.5)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x87, 0xe9, 0xfc, 0x7c, 0x78, 0x98, 0xd, 0xb0, 0x50,
+		0xbc, 0x29, 0x25, 0xf2, 0xa, 0x7d, 0x50, 0xd8, 0xe0, 0x78,
+		0x4e, 0x29, 0x47, 0x8a, 0x1a, 0x50, 0xee, 0xac, 0x35, 0xfe,
+		0x84, 0xc4, 0x53}
+	hash := imageHash(t, morph)
+	compareHashes(t, exp, hash)
+}
+
+// TestMorph75NRGBA tests that morphing an NRGBA image 75% of the way to a
+// destination image produces the expected output.
+func TestMorph75NRGBA(t *testing.T) {
+	// Morph the image.
+	sImg := image.NewNRGBA(blueGopherImage.Bounds())
+	copyImage(sImg.ColorModel(), sImg.Set, blueGopherImage)
+	dImg := image.NewNRGBA(plushGopherImage.Bounds())
+	copyImage(dImg.ColorModel(), dImg.Set, plushGopherImage)
+	morph, err := Morph(sImg, dImg, blueGopherMesh, plushGopherMesh, 0.75)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x76, 0xf9, 0x7, 0x25, 0x31, 0x6, 0x86, 0x68, 0x9b,
+		0xfd, 0xa4, 0x9c, 0x1a, 0xc0, 0x35, 0x6c, 0x62, 0xed, 0x7c,
+		0x39, 0xdc, 0xf2, 0x9f, 0xbd, 0x12, 0xd6, 0x6, 0x72, 0x5e,
+		0xad, 0xe8, 0x2a}
+	hash := imageHash(t, morph)
+	compareHashes(t, exp, hash)
+}
+
+// TestMorph100NRGBA tests that morphing an NRGBA image 100% of the way to a
+// destination image produces the expected output.
+func TestMorph100NRGBA(t *testing.T) {
+	// Morph the image.
+	sImg := image.NewNRGBA(blueGopherImage.Bounds())
+	copyImage(sImg.ColorModel(), sImg.Set, blueGopherImage)
+	dImg := image.NewNRGBA(plushGopherImage.Bounds())
+	copyImage(dImg.ColorModel(), dImg.Set, plushGopherImage)
+	morph, err := Morph(sImg, dImg, blueGopherMesh, plushGopherMesh, 1.0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Compare the image's hash value to an expected value.
+	exp := []byte{0x23, 0x4a, 0x67, 0xd6, 0x6c, 0x2, 0xac, 0x34, 0xc5,
+		0xcf, 0x79, 0x17, 0x62, 0x4, 0x54, 0xac, 0x5, 0x1a, 0x9a,
+		0x91, 0x4d, 0x5e, 0xb9, 0xb3, 0x26, 0xa9, 0x1c, 0x24, 0x2e,
+		0x67, 0xec, 0xe5}
 	hash := imageHash(t, morph)
 	compareHashes(t, exp, hash)
 }
