@@ -1,4 +1,4 @@
-// This file provides functions for distorting images.
+// This file provides functions for warping images.
 
 package morph
 

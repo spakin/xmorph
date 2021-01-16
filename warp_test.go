@@ -1,4 +1,4 @@
-// The functions defined in this file ensure the morph package's distortion
+// The functions defined in this file ensure the morph package's warp
 // operations work as expected.
 
 package morph
@@ -237,6 +237,18 @@ func copyGopherImage(cm color.Model, set func(x, y int, c color.Color)) {
 	}
 }
 
+// copyImage copies a given image's data, converting the color model as it
+// goes.
+func copyImage(cm color.Model, set func(x, y int, c color.Color), img image.Image) {
+	bnds := gopherImage.Bounds()
+	for y := bnds.Min.Y; y < bnds.Max.Y; y++ {
+		for x := bnds.Min.X; x < bnds.Max.X; x++ {
+			c := img.At(x, y)
+			set(x, y, cm.Convert(c))
+		}
+	}
+}
+
 // imageHash computes a SHA256 hash of an image.
 func imageHash(t *testing.T, img image.Image) []byte {
 	hash := sha256.New()
@@ -255,7 +267,7 @@ func compareHashes(t *testing.T, h1, h2 []byte) {
 	}
 	for i := range h1 {
 		if h1[i] != h2[i] {
-			t.Fatalf("hash mismatch: expected %v but saw %v", h1, h2)
+			t.Fatalf("hash mismatch: expected %#v but saw %#v", h1, h2)
 		}
 	}
 }
