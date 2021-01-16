@@ -225,18 +225,6 @@ func init() {
 	}
 }
 
-// copyGopherImage copies the gopher image's data, converting the color model
-// as it goes.
-func copyGopherImage(cm color.Model, set func(x, y int, c color.Color)) {
-	bnds := gopherImage.Bounds()
-	for y := bnds.Min.Y; y < bnds.Max.Y; y++ {
-		for x := bnds.Min.X; x < bnds.Max.X; x++ {
-			c := gopherImage.At(x, y)
-			set(x, y, cm.Convert(c))
-		}
-	}
-}
-
 // copyImage copies a given image's data, converting the color model as it
 // goes.
 func copyImage(cm color.Model, set func(x, y int, c color.Color), img image.Image) {
@@ -291,7 +279,7 @@ func writePNG(fn string, img image.Image) {
 func TestWarpNRGBA(t *testing.T) {
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -311,7 +299,7 @@ func TestWarpNRGBA(t *testing.T) {
 func TestWarpAlpha(t *testing.T) {
 	// Warp the image.
 	img := image.NewAlpha(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -331,7 +319,7 @@ func TestWarpAlpha(t *testing.T) {
 func TestWarpCMYK(t *testing.T) {
 	// Warp the image.
 	img := image.NewCMYK(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -351,7 +339,7 @@ func TestWarpCMYK(t *testing.T) {
 func TestWarpGray(t *testing.T) {
 	// Warp the image.
 	img := image.NewGray(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -371,7 +359,7 @@ func TestWarpGray(t *testing.T) {
 func TestWarpRGBA(t *testing.T) {
 	// Warp the image.
 	img := image.NewRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -391,7 +379,7 @@ func TestWarpRGBA(t *testing.T) {
 func TestWarpGray16(t *testing.T) {
 	// Warp the image.
 	img := image.NewGray16(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -411,7 +399,7 @@ func TestWarpGray16(t *testing.T) {
 func TestWarpRGBA64(t *testing.T) {
 	// Warp the image.
 	img := image.NewRGBA64(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -431,7 +419,7 @@ func TestWarpRGBA64(t *testing.T) {
 func TestWarp0NRGBA(t *testing.T) {
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 0.0)
 	if err != nil {
 		t.Fatal(err)
@@ -451,7 +439,7 @@ func TestWarp0NRGBA(t *testing.T) {
 func TestWarp25NRGBA(t *testing.T) {
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 0.25)
 	if err != nil {
 		t.Fatal(err)
@@ -471,7 +459,7 @@ func TestWarp25NRGBA(t *testing.T) {
 func TestWarp66NRGBA(t *testing.T) {
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 0.66)
 	if err != nil {
 		t.Fatal(err)
@@ -495,7 +483,7 @@ func TestWarpNRGBANN(t *testing.T) {
 
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -522,7 +510,7 @@ func TestWarpNRGBABilinear(t *testing.T) {
 
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
@@ -549,7 +537,7 @@ func TestWarpNRGBALanczos4(t *testing.T) {
 
 	// Warp the image.
 	img := image.NewNRGBA(gopherImage.Bounds())
-	copyGopherImage(img.ColorModel(), img.Set)
+	copyImage(img.ColorModel(), img.Set, gopherImage)
 	warp, err := Warp(img, gopherMeshIn, gopherMeshOut, 1.0)
 	if err != nil {
 		t.Fatal(err)
