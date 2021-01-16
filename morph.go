@@ -1,6 +1,6 @@
 // This file provides functions for morphing images.
 
-package morph
+package xmorph
 
 import (
 	"fmt"

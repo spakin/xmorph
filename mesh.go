@@ -1,6 +1,6 @@
 // This file provides a mesh abstraction.
 
-package morph
+package xmorph
 
 /*
 #include <stdlib.h>

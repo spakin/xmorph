@@ -1,7 +1,7 @@
-// The functions defined in this file ensure the morph package's Mesh
+// The functions defined in this file ensure the xmorph package's Mesh
 // operations work as expected.
 
-package morph
+package xmorph
 
 import (
 	"bytes"

@@ -1,7 +1,7 @@
-// The functions defined in this file ensure the morph package's Point
+// The functions defined in this file ensure the xmorph package's Point
 // operations work as expected.
 
-package morph
+package xmorph
 
 import (
 	"fmt"
@@ -125,8 +125,8 @@ func TestFormat(t *testing.T) {
 	pt := Point{X: 12.3, Y: -45.6}
 	fmtExp := [][2]string{
 		[2]string{"%v", "[12.3, -45.6]"},
-		[2]string{"%#v", "morph.Point{X:12.3, Y:-45.6}"},
-		[2]string{"%T", "morph.Point"},
+		[2]string{"%#v", "xmorph.Point{X:12.3, Y:-45.6}"},
+		[2]string{"%T", "xmorph.Point"},
 		[2]string{"%f", "[12.300000, -45.600000]"},
 		[2]string{"%.1f", "[12.3, -45.6]"},
 		[2]string{"%6.1f", "[  12.3,  -45.6]"},

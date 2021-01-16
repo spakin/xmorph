@@ -1,7 +1,7 @@
-// The functions defined in this file ensure the morph package's morph
+// The functions defined in this file ensure the xmorph package's morph
 // operations work as expected.
 
-package morph
+package xmorph
 
 import (
 	"encoding/base64"

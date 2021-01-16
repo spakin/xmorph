@@ -1,6 +1,6 @@
 // This file provides functions for warping images.
 
-package morph
+package xmorph
 
 /*
 #include <xmorph/mesh.h>

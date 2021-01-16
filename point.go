@@ -1,7 +1,7 @@
 // This file provides a point abstraction that is analogous to image.Point but
 // based on floating-point rather than integer coordinates.
 
-package morph
+package xmorph
 
 import (
 	"fmt"

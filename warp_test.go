@@ -1,7 +1,7 @@
-// The functions defined in this file ensure the morph package's warp
+// The functions defined in this file ensure the xmorph package's warp
 // operations work as expected.
 
-package morph
+package xmorph
 
 import (
 	"crypto/sha256"
