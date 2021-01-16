@@ -108,8 +108,8 @@ func warpAny(img image.Image, src, dst *Mesh) *image.NRGBA {
 	return warpNRGBA(nrgba, src, dst)
 }
 
-// warpOnly distorts an image by warping an input mesh to an output mesh.
-func warpOnly(img image.Image, src, dst *Mesh) (image.Image, error) {
+// warpCompletely distorts an image by warping an input mesh to an output mesh.
+func warpCompletely(img image.Image, src, dst *Mesh) (image.Image, error) {
 	if C.meshCompatibilityCheck(src.mesh, dst.mesh) != 0 {
 		return nil, fmt.Errorf("incompatible meshes passed to InterpolateMeshes")
 	}
@@ -138,5 +138,5 @@ func Warp(img image.Image, src, dst *Mesh, t float64) (image.Image, error) {
 	}
 
 	// Warp from the source mesh to the target (not destination) mesh.
-	return warpOnly(img, src, target)
+	return warpCompletely(img, src, target)
 }

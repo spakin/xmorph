@@ -17,7 +17,7 @@ func avgU8(a, b uint8, t float64) uint8 {
 	return uint8(math.Round(fa + fb))
 }
 
-// morphNRGBA morphs an NRGBA image.
+// morphNRGBA morphs two NRGBA images.
 func morphNRGBA(sImg, dImg *image.NRGBA, sMesh, dMesh *Mesh, t float64) (*image.NRGBA, error) {
 	// Separately warp the source and destination images.
 	sw, err := Warp(sImg, sMesh, dMesh, t)
@@ -50,7 +50,7 @@ func morphNRGBA(sImg, dImg *image.NRGBA, sMesh, dMesh *Mesh, t float64) (*image.
 	return img, nil
 }
 
-// morphGray morphs a Gray image.
+// morphGray morphs two Gray images.
 func morphGray(sImg, dImg *image.Gray, sMesh, dMesh *Mesh, t float64) (*image.Gray, error) {
 	// Separately warp the source and destination images.
 	sw, err := Warp(sImg, sMesh, dMesh, t)
@@ -80,7 +80,7 @@ func morphGray(sImg, dImg *image.Gray, sMesh, dMesh *Mesh, t float64) (*image.Gr
 	return img, nil
 }
 
-// morphCMYK morphs a CMYK image.
+// morphCMYK morphs two CMYK images.
 func morphCMYK(sImg, dImg *image.CMYK, sMesh, dMesh *Mesh, t float64) (*image.CMYK, error) {
 	// Separately warp the source and destination images.
 	sw, err := Warp(sImg, sMesh, dMesh, t)
@@ -113,7 +113,7 @@ func morphCMYK(sImg, dImg *image.CMYK, sMesh, dMesh *Mesh, t float64) (*image.CM
 	return img, nil
 }
 
-// morphAlpha morphs an Alpha image.
+// morphAlpha morphs two Alpha images.
 func morphAlpha(sImg, dImg *image.Alpha, sMesh, dMesh *Mesh, t float64) (*image.Alpha, error) {
 	// Separately warp the source and destination images.
 	sw, err := Warp(sImg, sMesh, dMesh, t)
@@ -143,11 +143,32 @@ func morphAlpha(sImg, dImg *image.Alpha, sMesh, dMesh *Mesh, t float64) (*image.
 	return img, nil
 }
 
+// morphAny morphs two images of any type by first converting them to NRGBA and
+// then invoking morphNRGBA.
+func morphAny(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (*image.NRGBA, error) {
+	bnds := sImg.Bounds()
+	sNrgba := image.NewNRGBA(bnds)
+	dNrgba := image.NewNRGBA(bnds)
+	cm := sNrgba.ColorModel()
+	for y := bnds.Min.Y; y < bnds.Max.Y; y++ {
+		for x := bnds.Min.X; x < bnds.Max.X; x++ {
+			sc := sImg.At(x, y)
+			sNrgba.Set(x, y, cm.Convert(sc))
+			dc := dImg.At(x, y)
+			dNrgba.Set(x, y, cm.Convert(dc))
+		}
+	}
+	return morphNRGBA(sNrgba, dNrgba, sMesh, dMesh, t)
+}
+
 // Morph morphs one image to another by warping an input mesh some fraction of
 // the way to an output mesh.
 func Morph(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (image.Image, error) {
+	if sImg.Bounds() != dImg.Bounds() {
+		return nil, fmt.Errorf("images to morph must have the same bounds")
+	}
 	if reflect.TypeOf(sImg) != reflect.TypeOf(dImg) {
-		panic(fmt.Sprintf("morphing from %T to %T is not yet implemented", sImg, dImg)) // TODO: implement
+		return morphAny(sImg, dImg, sMesh, dMesh, t)
 	}
 	switch sImg.(type) {
 	case *image.NRGBA:
@@ -163,6 +184,6 @@ func Morph(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (image.Image, 
 		return morphAlpha(sImg.(*image.Alpha), dImg.(*image.Alpha),
 			sMesh, dMesh, t)
 	default:
-		panic(fmt.Sprintf("morphing from %T to %T is not yet implemented", sImg, dImg)) // TODO: implement
+		return morphAny(sImg, dImg, sMesh, dMesh, t)
 	}
 }
