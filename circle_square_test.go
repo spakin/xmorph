@@ -1,14 +1,5 @@
-/*
-This file presents a complete example of morphing one image to another.
-Regrettably, the code is rather large because it is fully self-contained: all
-images and meshes are generated internally rather than read from files.
+// This file presents a complete morphing example.
 
-The code morphs a large circle colored with a green and white gradient pattern
-and positioned in the upper-left quadrant of the image to a large square
-colored with a yellow and white gradient and positioned in the lower-right
-quadrant of the image.  As output, the code creates an animated GIF image
-called circle-square.gif.
-*/
 package xmorph_test
 
 import (
@@ -143,6 +134,15 @@ func MakePaletted(img image.Image, pal color.Palette) *image.Paletted {
 	return pImg
 }
 
+// This is a complete example of gradually morphing one image to another.
+// Regrettably, the code is rather large because it is fully self-contained:
+// all images and meshes are generated internally rather than read from files.
+//
+// The code morphs a large circle colored with a green and white gradient
+// pattern and positioned in the upper-left quadrant of the image to a large
+// square colored with a yellow and white gradient and positioned in the
+// lower-right quadrant of the image.  The code saves the morph sequence to an
+// animated GIF image called circle-square.gif.
 func Example_animatedGIF() {
 	// Create the source and destination image and mesh.
 	cImg, cMesh := PrepareCircle(256, 256, 96, 96, 64)
