@@ -71,9 +71,8 @@ func (p Point) formatString(st fmt.State, verb rune) string {
 			str := fmt.Sprintf("%#v", RawPoint(p))
 			str = strings.Replace(str, "RawPoint", "Point", 1)
 			return str
-		} else {
-			return fmt.Sprintf("[%v, %v]", p.X, p.Y)
 		}
+		return fmt.Sprintf("[%v, %v]", p.X, p.Y)
 	case 'b', 'e', 'E', 'f', 'F', 'g', 'G', 'x', 'X':
 		// Propagate all known flags when provided.
 		fstr := "%"

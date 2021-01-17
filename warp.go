@@ -127,8 +127,8 @@ func warpCompletely(img image.Image, src, dst *Mesh) (image.Image, error) {
 	}
 }
 
-// Warp distorts an image by warping an input mesh some fraction of the way to
-// an output mesh.
+// Warp distorts an image by warping a source mesh some fraction of the way to
+// a destination mesh.
 func Warp(img image.Image, src, dst *Mesh, t float64) (image.Image, error) {
 	// Distort the source mesh a fraction of the way towards the
 	// destination mesh to produce a target mesh.

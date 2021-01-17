@@ -168,8 +168,8 @@ func morphAny(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (*image.NRG
 	return morphNRGBA(sNrgba, dNrgba, sMesh, dMesh, t)
 }
 
-// Morph morphs one image to another by warping an input mesh some fraction of
-// the way to an output mesh.
+// Morph morphs one image to another by warping a source mesh some fraction of
+// the way to a destination mesh.
 func Morph(sImg, dImg image.Image, sMesh, dMesh *Mesh, t float64) (image.Image, error) {
 	if sImg.Bounds() != dImg.Bounds() {
 		return nil, fmt.Errorf("images to morph must have the same bounds")
