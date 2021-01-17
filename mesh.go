@@ -25,7 +25,7 @@ type Mesh struct {
 	mesh *C.MeshT // Underlying mesh representation
 }
 
-// NewMesh creates a new mesh of a given number of vertices.
+// NewMesh creates a new, empty mesh of a given number of vertices.
 func NewMesh(nx, ny int) *Mesh {
 	return &Mesh{
 		NX:   nx,
@@ -169,6 +169,22 @@ func MeshFromImagePoints(sl [][]image.Point) *Mesh {
 		}
 	}
 	return m
+}
+
+// NewRegularMesh creates a new, regular mesh of a given number of vertices.
+func NewRegularMesh(nx, ny, wd, ht int) *Mesh {
+	wd1, ht1 := wd-1, ht-1
+	nx1, ny1 := float64(nx-1), float64(ny-1)
+	sl := make([][]Point, ny)
+	for r := range sl {
+		sl[r] = make([]Point, nx)
+		y := float64(r*ht1) / ny1
+		for c := range sl[r] {
+			x := float64(c*wd1) / nx1
+			sl[r][c] = Point{X: x, Y: y}
+		}
+	}
+	return MeshFromPoints(sl)
 }
 
 // Points converts a mesh to a 2-D slice of morph.Points.

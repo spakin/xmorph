@@ -188,6 +188,47 @@ func TestMeshFromImagePoints(t *testing.T) {
 	m4.Free()
 }
 
+// TestNewRegularMesh tests that we can create a regular mesh.
+func TestNewRegularMesh(t *testing.T) {
+	// Define a set of tests to perform.
+	const wd, ht = 1024, 768
+	nxNy := []image.Point{
+		{9, 9}, {10, 10}, {12, 9}, {16, 18}, {102, 76},
+	}
+	close := func(a, b float64) bool {
+		// Return true if two floating-point values are close enough to
+		// be considered equal.
+		return math.Abs(a-b) < 1e-10
+	}
+
+	// Ensure each mesh is indeed regular.
+	for _, mSize := range nxNy {
+		nx, ny := mSize.X, mSize.Y
+		deltaX, deltaY := (wd-1)/float64(nx-1), (ht-1)/float64(ny-1)
+		m := NewRegularMesh(nx, ny, wd, ht)
+		sl := m.Points()
+		for r := 0; r < ny-1; r++ {
+			for c := 0; c < nx-1; c++ {
+				// Test the x delta.
+				pt := sl[r][c]
+				dx := sl[r][c+1].Sub(pt).X
+				if !close(dx, deltaX) {
+					t.Fatalf("expected a delta of %.5g from (%d, %d) - (%d, %d) but saw %.5g",
+						deltaX, c, r, c+1, r, dx)
+				}
+
+				// Test the y delta.
+				dy := sl[r+1][c].Sub(pt).Y
+				if !close(dy, deltaY) {
+					t.Fatalf("expected a delta of %.5g from (%d, %d) - (%d, %d) but saw %.5g",
+						deltaY, c, r, c, r+1, dy)
+				}
+			}
+		}
+		m.Free()
+	}
+}
+
 // TestWrite tests that we can write a mesh to an io.Writer.
 func TestWrite(t *testing.T) {
 	// Create a Mesh with known contents.
@@ -201,6 +242,7 @@ func TestWrite(t *testing.T) {
 		}
 	}
 	m := MeshFromPoints(s)
+	defer m.Free()
 
 	// Write a mesh file to a bytes.Buffer.
 	var buf bytes.Buffer
