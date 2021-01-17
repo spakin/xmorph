@@ -368,6 +368,46 @@ func (m *Mesh) Scale(w, h int) {
 	C.meshScale(m.mesh, C.int(w), C.int(h))
 }
 
+// A Direction can be either horizontal or vertical.
+type Direction int
+
+// These are the acceptable values for a direction.
+const (
+	Vertical   Direction = 1
+	Horizontal           = 2
+)
+
+// AddLine adds a row or column to the mesh, fraction f of the way
+// from index i to index i + 1.
+func (m *Mesh) AddLine(i int, f float64, d Direction) error {
+	// Sanity-check our arguments so libmorph doesn't write its own error
+	// message to stderr.
+	switch d {
+	case Vertical:
+		if i < 0 || i >= m.NX-1 {
+			return fmt.Errorf("index %d lies outside the range [0, %d]", i, m.NX-2)
+		}
+	case Horizontal:
+		if i < 0 || i >= m.NY-1 {
+			return fmt.Errorf("index %d lies outside the range [0, %d]", i, m.NY-2)
+		}
+	default:
+		return fmt.Errorf("unexpected direction %d", d)
+	}
+	if f < 0.0 || f > 1.0 {
+		return fmt.Errorf("line-adding fraction must lie in [0.0, 1.0]")
+	}
+
+	// Add the line.
+	r := C.meshLineAdd(m.mesh, C.int(i), C.double(f), C.int(d))
+	if r != 0 {
+		return fmt.Errorf("AddLine failed to add a line (id = %d)", r)
+	}
+	m.NX = int(m.mesh.nx)
+	m.NY = int(m.mesh.ny)
+	return nil
+}
+
 // Copy deep-copies a mesh.
 func (m *Mesh) Copy() *Mesh {
 	mc := NewMesh(int(m.mesh.nx), int(m.mesh.ny))

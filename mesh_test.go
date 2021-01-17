@@ -481,7 +481,7 @@ func validateMeshDimens(t *testing.T, m *Mesh, wd, ht int) {
 	}
 }
 
-// TestScale ensures we can deep-copy a mesh.
+// TestScale ensures we can scale mesh coordinates.
 func TestScale(t *testing.T) {
 	// Create a mesh.
 	m := NewMesh(5, 5)
@@ -506,6 +506,64 @@ func TestScale(t *testing.T) {
 			act := m.Get(c, r)
 			if act != exp {
 				t.Fatalf("expected %v at (%d, %d) but saw %v", exp, c, r, act)
+			}
+		}
+	}
+}
+
+// TestAddLine ensures we can add a line to a mesh.
+func TestAddLine(t *testing.T) {
+	// Create a mesh.
+	m := NewMesh(5, 5)
+	fs := []float64{0.0, 10.0, 20.0, 50.0, 100.0}
+	for r, y := range fs {
+		for c, x := range fs {
+			m.Set(c, r, Point{X: x, Y: y})
+		}
+	}
+
+	// Add a vertical line to the left.
+	err := m.AddLine(0, 0.25, Vertical)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Add a vertical line to the right.
+	err = m.AddLine(4, 0.5, Vertical)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Add a horizontal line to the bottom.
+	err = m.AddLine(3, 0.33, Horizontal)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Add a horizontal line to the middle.
+	err = m.AddLine(1, 0.82, Horizontal)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Validate the results.
+	if m.NX != 7 || m.NY != 7 {
+		t.Fatalf("expected the augmented mesh to be 7x7 but saw %dx%d", m.NX, m.NY)
+	}
+	exp := [][]Point{
+		{{0, 0}, {2.5, 0}, {10, 0}, {20, 0}, {50, 0}, {75, 0}, {100, 0}},
+		{{0, 10}, {2.5, 10}, {10, 10}, {20, 10}, {50, 10}, {75, 10}, {100, 10}},
+		{{0, 18.2}, {2.5, 18.2}, {10, 18.2}, {20, 18.2}, {50, 18.2}, {75, 18.2}, {100, 18.2}},
+		{{0, 20}, {2.5, 20}, {10, 20}, {20, 20}, {50, 20}, {75, 20}, {100, 20}},
+		{{0, 50}, {2.5, 50}, {10, 50}, {20, 50}, {50, 50}, {75, 50}, {100, 50}},
+		{{0, 66.5}, {2.5, 66.5}, {10, 66.5}, {20, 66.5}, {50, 66.5}, {75, 66.5}, {100, 66.5}},
+		{{0, 100}, {2.5, 100}, {10, 100}, {20, 100}, {50, 100}, {75, 100}, {100, 100}},
+	}
+	act := m.Points()
+	for r, row := range exp {
+		for c := range row {
+			if act[r][c] != exp[r][c] {
+				t.Fatalf("expected %v but saw %v at (%d, %d)", exp[r][c], act[r][c], c, r)
 			}
 		}
 	}
