@@ -25,8 +25,8 @@ type Mesh struct {
 	mesh *C.MeshT // Underlying mesh representation
 }
 
-// NewMesh creates a new, empty mesh of a given number of vertices.
-func NewMesh(nx, ny int) *Mesh {
+// NewEmptyMesh creates a new, empty mesh of a given number of vertices.
+func NewEmptyMesh(nx, ny int) *Mesh {
 	return &Mesh{
 		NX:   nx,
 		NY:   ny,
@@ -55,7 +55,7 @@ func MeshFromPoints(sl [][]Point) *Mesh {
 	}
 
 	// Create an empty mesh.
-	m := NewMesh(nx, ny)
+	m := NewEmptyMesh(nx, ny)
 
 	// Populate the mesh element by element.
 	np := nx * ny
@@ -154,7 +154,7 @@ func MeshFromImagePoints(sl [][]image.Point) *Mesh {
 	}
 
 	// Create an empty mesh.
-	m := NewMesh(nx, ny)
+	m := NewEmptyMesh(nx, ny)
 
 	// Populate the mesh element by element.
 	np := nx * ny
@@ -453,7 +453,7 @@ func (m *Mesh) DeleteLine(i int, d Direction) error {
 
 // Copy deep-copies a mesh.
 func (m *Mesh) Copy() *Mesh {
-	mc := NewMesh(int(m.mesh.nx), int(m.mesh.ny))
+	mc := NewEmptyMesh(int(m.mesh.nx), int(m.mesh.ny))
 	C.meshCopy(mc.mesh, m.mesh)
 	return mc
 }

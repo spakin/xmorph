@@ -12,13 +12,13 @@ import (
 	"testing"
 )
 
-// TestNewMesh ensures that meshes of various sizes can be created and don't
+// TestNewEmptyMesh ensures that meshes of various sizes can be created and don't
 // crash.
-func TestNewMesh(t *testing.T) {
-	m1 := NewMesh(4, 4)         // Minimal mesh size
-	m2 := NewMesh(101, 7)       // Wide and short
-	m3 := NewMesh(7, 101)       // Tall and narrow
-	m4 := NewMesh(30000, 30000) // Very large
+func TestNewEmptyMesh(t *testing.T) {
+	m1 := NewEmptyMesh(4, 4)         // Minimal mesh size
+	m2 := NewEmptyMesh(101, 7)       // Wide and short
+	m3 := NewEmptyMesh(7, 101)       // Tall and narrow
+	m4 := NewEmptyMesh(30000, 30000) // Very large
 	m1.Free()
 	m2.Free()
 	m3.Free()
@@ -416,7 +416,7 @@ func TestMeshGetSet(t *testing.T) {
 		ny  = 10
 		inc = 1.625
 	)
-	m := NewMesh(nx, ny)
+	m := NewEmptyMesh(nx, ny)
 	idx := 1.0
 	for i := 0; i < nx; i++ {
 		for j := 0; j < ny; j++ {
@@ -456,7 +456,7 @@ func TestMeshGetSetImage(t *testing.T) {
 		ny  = 11
 		inc = 3
 	)
-	m := NewMesh(nx, ny)
+	m := NewEmptyMesh(nx, ny)
 	idx := 1
 	for i := 0; i < nx; i++ {
 		for j := 0; j < ny; j++ {
@@ -526,7 +526,7 @@ func validateMeshDimens(t *testing.T, m *Mesh, wd, ht int) {
 // TestScale ensures we can scale mesh coordinates.
 func TestScale(t *testing.T) {
 	// Create a mesh.
-	m := NewMesh(5, 5)
+	m := NewEmptyMesh(5, 5)
 	fs := []float64{0.0, 0.25, 0.5, 0.75, 1.0}
 	for r, y := range fs {
 		for c, x := range fs {
@@ -556,7 +556,7 @@ func TestScale(t *testing.T) {
 // TestAddLine ensures we can add a line to a mesh.
 func TestAddLine(t *testing.T) {
 	// Create a mesh.
-	m := NewMesh(5, 5)
+	m := NewEmptyMesh(5, 5)
 	fs := []float64{0.0, 10.0, 20.0, 50.0, 100.0}
 	for r, y := range fs {
 		for c, x := range fs {
@@ -614,7 +614,7 @@ func TestAddLine(t *testing.T) {
 // TestDeleteLine ensures we can delete a line to a mesh.
 func TestDeleteLine(t *testing.T) {
 	// Create a mesh.
-	m := NewMesh(6, 6)
+	m := NewEmptyMesh(6, 6)
 	fs := []float64{0.0, 10.0, 20.0, 50.0, 85.0, 100.0}
 	for r, y := range fs {
 		for c, x := range fs {
