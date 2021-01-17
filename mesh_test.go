@@ -569,6 +569,56 @@ func TestAddLine(t *testing.T) {
 	}
 }
 
+// TestDeleteLine ensures we can delete a line to a mesh.
+func TestDeleteLine(t *testing.T) {
+	// Create a mesh.
+	m := NewMesh(6, 6)
+	fs := []float64{0.0, 10.0, 20.0, 50.0, 85.0, 100.0}
+	for r, y := range fs {
+		for c, x := range fs {
+			m.Set(c, r, Point{X: x, Y: y})
+		}
+	}
+
+	// Remove the leftmost column.
+	err := m.DeleteLine(0, Vertical)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Remove the bottommost row.
+	err = m.DeleteLine(5, Horizontal)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Remove the central column.
+	err = m.DeleteLine(2, Vertical)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Validate the results.
+	if m.NX != 4 || m.NY != 5 {
+		t.Fatalf("expected the augmented mesh to be 7x7 but saw %dx%d", m.NX, m.NY)
+	}
+	exp := [][]Point{
+		{{10, 0}, {20, 0}, {85, 0}, {100, 0}},
+		{{10, 10}, {20, 10}, {85, 10}, {100, 10}},
+		{{10, 20}, {20, 20}, {85, 20}, {100, 20}},
+		{{10, 50}, {20, 50}, {85, 50}, {100, 50}},
+		{{10, 85}, {20, 85}, {85, 85}, {100, 85}},
+	}
+	act := m.Points()
+	for r, row := range exp {
+		for c := range row {
+			if act[r][c] != exp[r][c] {
+				t.Fatalf("expected %v but saw %v at (%d, %d)", exp[r][c], act[r][c], c, r)
+			}
+		}
+	}
+}
+
 // TestCopy ensures we can deep-copy a mesh.
 func TestCopy(t *testing.T) {
 	// Ensure that no data changes during a copy.

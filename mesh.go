@@ -408,6 +408,33 @@ func (m *Mesh) AddLine(i int, f float64, d Direction) error {
 	return nil
 }
 
+// DeleteLine deletes a row or column from the mesh.
+func (m *Mesh) DeleteLine(i int, d Direction) error {
+	// Sanity-check our arguments so libmorph doesn't write its own error
+	// message to stderr.
+	switch d {
+	case Vertical:
+		if i < 0 || i >= m.NX {
+			return fmt.Errorf("index %d lies outside the range [0, %d]", i, m.NX-1)
+		}
+	case Horizontal:
+		if i < 0 || i >= m.NY {
+			return fmt.Errorf("index %d lies outside the range [0, %d]", i, m.NY-1)
+		}
+	default:
+		return fmt.Errorf("unexpected direction %d", d)
+	}
+
+	// Delete the line.
+	r := C.meshLineDelete(m.mesh, C.int(i), C.int(d))
+	if r != 0 {
+		return fmt.Errorf("AddLine failed to add a line (id = %d)", r)
+	}
+	m.NX = int(m.mesh.nx)
+	m.NY = int(m.mesh.ny)
+	return nil
+}
+
 // Copy deep-copies a mesh.
 func (m *Mesh) Copy() *Mesh {
 	mc := NewMesh(int(m.mesh.nx), int(m.mesh.ny))
