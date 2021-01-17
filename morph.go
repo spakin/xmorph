@@ -19,12 +19,19 @@ func avgU8(a, b uint8, t float64) uint8 {
 
 // morphNRGBA morphs two NRGBA images.
 func morphNRGBA(sImg, dImg *image.NRGBA, sMesh, dMesh *Mesh, t float64) (*image.NRGBA, error) {
-	// Separately warp the source and destination images.
-	sw, err := Warp(sImg, sMesh, dMesh, t)
+	// Create an mesh intermediate to the source and destination meshes.
+	mMesh, err := InterpolateMeshes(sMesh, dMesh, t)
 	if err != nil {
 		return nil, err
 	}
-	dw, err := Warp(dImg, sMesh, dMesh, 1.0-t)
+
+	// Separately warp the source and destination images to the
+	// intermediate mesh.
+	sw, err := Warp(sImg, sMesh, mMesh, 1.0)
+	if err != nil {
+		return nil, err
+	}
+	dw, err := Warp(dImg, dMesh, mMesh, 1.0)
 	if err != nil {
 		return nil, err
 	}
