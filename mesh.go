@@ -363,6 +363,11 @@ func (m *Mesh) Functionalize(w, h int) int {
 	return int(nc)
 }
 
+// Scale scales mesh coordinates to fit a given image width and height.
+func (m *Mesh) Scale(w, h int) {
+	C.meshScale(m.mesh, C.int(w), C.int(h))
+}
+
 // Copy deep-copies a mesh.
 func (m *Mesh) Copy() *Mesh {
 	mc := NewMesh(int(m.mesh.nx), int(m.mesh.ny))

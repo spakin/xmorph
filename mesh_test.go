@@ -481,6 +481,36 @@ func validateMeshDimens(t *testing.T, m *Mesh, wd, ht int) {
 	}
 }
 
+// TestScale ensures we can deep-copy a mesh.
+func TestScale(t *testing.T) {
+	// Create a mesh.
+	m := NewMesh(5, 5)
+	fs := []float64{0.0, 0.25, 0.5, 0.75, 1.0}
+	for r, y := range fs {
+		for c, x := range fs {
+			m.Set(c, r, Point{X: x, Y: y})
+		}
+	}
+
+	// Scale it to a 100x50 image.
+	m.Scale(100, 50)
+	for r, y := range fs {
+		for c, x := range fs {
+			exp := Point{x * 100.0, y * 50.0}
+			if exp.X == 100.0 {
+				exp.X = 99.0 // Clamp to image bounds.
+			}
+			if exp.Y == 50.0 {
+				exp.Y = 49.0 // Clamp to image bounds.
+			}
+			act := m.Get(c, r)
+			if act != exp {
+				t.Fatalf("expected %v at (%d, %d) but saw %v", exp, c, r, act)
+			}
+		}
+	}
+}
+
 // TestCopy ensures we can deep-copy a mesh.
 func TestCopy(t *testing.T) {
 	// Ensure that no data changes during a copy.
