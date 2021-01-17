@@ -15,6 +15,7 @@ import (
 	"image"
 	"io"
 	"math"
+	"strings"
 	"unsafe"
 )
 
@@ -456,6 +457,22 @@ func (m *Mesh) Copy() *Mesh {
 	mc := NewEmptyMesh(int(m.mesh.nx), int(m.mesh.ny))
 	C.meshCopy(mc.mesh, m.mesh)
 	return mc
+}
+
+// Format returns a textual representation of a Mesh's coordinates, using the
+// flags it receives to format each Point.
+func (m *Mesh) Format(st fmt.State, verb rune) {
+	frags := make([]string, m.NY)
+	pts := m.Points()
+	for r, row := range pts {
+		rFrags := make([]string, m.NX)
+		for c, pt := range row {
+			rFrags[c] = pt.formatString(st, verb)
+		}
+		rStr := strings.Join(rFrags, ", ")
+		frags[r] = fmt.Sprintf("[%s]", rStr)
+	}
+	fmt.Fprintf(st, "[%s]", strings.Join(frags, ", "))
 }
 
 // InterpolateMeshes interpolates two meshes to produce a new mesh that lies a

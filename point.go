@@ -61,18 +61,18 @@ func (p Point) Eq(q Point, tol float64) bool {
 	return dx <= tol && dy <= tol
 }
 
-// Format applies standard numeric formatting to a Point's coordinates when
-// outputting it via fmt.Printf et al.
-func (p Point) Format(st fmt.State, verb rune) {
+// formatString performs most of the work for Format.  The difference is that
+// it returns a string, which Format sends to the correct receiver.
+func (p Point) formatString(st fmt.State, verb rune) string {
 	type RawPoint Point // Fresh method set
 	switch verb {
 	case 'v':
 		if st.Flag('#') {
 			str := fmt.Sprintf("%#v", RawPoint(p))
 			str = strings.Replace(str, "RawPoint", "Point", 1)
-			fmt.Fprint(st, str)
+			return str
 		} else {
-			fmt.Fprintf(st, "[%v, %v]", p.X, p.Y)
+			return fmt.Sprintf("[%v, %v]", p.X, p.Y)
 		}
 	case 'b', 'e', 'E', 'f', 'F', 'g', 'G', 'x', 'X':
 		// Propagate all known flags when provided.
@@ -97,6 +97,13 @@ func (p Point) Format(st fmt.State, verb rune) {
 		fstr += string(verb)
 
 		// Apply the format to X and Y.
-		fmt.Fprintf(st, "["+fstr+", "+fstr+"]", p.X, p.Y)
+		return fmt.Sprintf("["+fstr+", "+fstr+"]", p.X, p.Y)
 	}
+	return "%![invalid Point format]"
+}
+
+// Format applies standard numeric formatting to a Point's coordinates when
+// outputting it via fmt.Printf et al.
+func (p Point) Format(st fmt.State, verb rune) {
+	fmt.Fprintf(st, p.formatString(st, verb))
 }
