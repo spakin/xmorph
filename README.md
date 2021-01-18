@@ -7,6 +7,8 @@ xmorph
 
 ![gopher-plush](https://user-images.githubusercontent.com/650041/104868453-9c2d0400-5900-11eb-9fd9-c8068d669393.gif)
 
+[Credit: The Go gopher was created by [Renée French](https://www.instagram.com/reneefrench/).  It was manufactured as a plush toy by [Squishable](https://www.squishable.com/).]
+
 Description
 -----------
 
