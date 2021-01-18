@@ -1,3 +1,5 @@
+BSD 3-Clause License
+
 Copyright © 2021, Scott Pakin
 All rights reserved.
 
