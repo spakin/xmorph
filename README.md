@@ -1,6 +1,9 @@
 xmorph
 ======
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/spakin/xmorph.svg)](https://pkg.go.dev/github.com/spakin/xmorph)
+[![Go Report Card](https://goreportcard.com/badge/github.com/spakin/xmorph)](https://goreportcard.com/report/github.com/spakin/xmorph)
+
 Description
 -----------
 

@@ -400,7 +400,7 @@ feature 2
 
 	// Ensure that any other subset returns an error.
 	for n := 21; n >= 0; n-- {
-		m, err = ReadMesh(strings.NewReader(strings.Join(lines[:n], "\n")))
+		_, err = ReadMesh(strings.NewReader(strings.Join(lines[:n], "\n")))
 		if err == nil {
 			t.Fatalf("truncating a mesh file to %d lines was supposed to return an error but didn't", n)
 		}
