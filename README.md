@@ -2,7 +2,10 @@ xmorph
 ======
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/spakin/xmorph.svg)](https://pkg.go.dev/github.com/spakin/xmorph)
+[![Go project version](https://badge.fury.io/go/github.com%2Fspakin%2Fxmorph.svg)](https://badge.fury.io/go/github.com%2Fspakin%2Fxmorph)
 [![Go Report Card](https://goreportcard.com/badge/github.com/spakin/xmorph)](https://goreportcard.com/report/github.com/spakin/xmorph)
+
+![gopher-plush](https://user-images.githubusercontent.com/650041/104868453-9c2d0400-5900-11eb-9fd9-c8068d669393.gif)
 
 Description
 -----------
