@@ -41,10 +41,10 @@ func (m *Mesh) Free() {
 	m.mesh = nil
 }
 
-// MeshFromPoints creates a new mesh from a 2-D slice of morph.Points.
+// MeshFromPoints creates a new mesh from a 2-D slice of xmorph.Points.
 func MeshFromPoints(sl [][]Point) *Mesh {
-	// Sanity check the mesh lest libmorph doesn't write something itself
-	// to standard error.
+	// Sanity check the mesh lest libmorph write something itself to
+	// standard error.
 	if len(sl) < 4 || len(sl[0]) < 4 {
 		panic("slice passed to MeshFromPoints must be at least 4x4")
 	}
@@ -188,7 +188,7 @@ func NewRegularMesh(nx, ny, wd, ht int) *Mesh {
 	return MeshFromPoints(sl)
 }
 
-// Points converts a mesh to a 2-D slice of morph.Points.
+// Points converts a mesh to a 2-D slice of xmorph.Points.
 func (m *Mesh) Points() [][]Point {
 	// Represent the MeshT's flat lists of x and y values as Go slices.
 	nx, ny := int(m.mesh.nx), int(m.mesh.ny)
@@ -339,7 +339,7 @@ func (m *Mesh) checkMeshCoord(x, y int) {
 	}
 }
 
-// Get returns the morph.Point at (x, y).
+// Get returns the xmorph.Point at (x, y).
 func (m *Mesh) Get(x, y int) Point {
 	m.checkMeshCoord(x, y)
 	cx, cy := C.int(x), C.int(y)
@@ -358,7 +358,7 @@ func (m *Mesh) GetImagePoint(x, y int) image.Point {
 	}
 }
 
-// Set assigns the morph.Point at (x, y).
+// Set assigns the xmorph.Point at (x, y).
 func (m *Mesh) Set(x, y int, pt Point) {
 	m.checkMeshCoord(x, y)
 	cx, cy := C.int(x), C.int(y)

@@ -25,7 +25,7 @@ func TestNewEmptyMesh(t *testing.T) {
 	m4.Free()
 }
 
-// random2DPoints allocates and populates a 2-D slice with random morph.Points.
+// random2DPoints allocates and populates a 2-D slice with random xmorph.Points.
 func random2DPoints(rng *rand.Rand, nx, ny int) [][]Point {
 	s := make([][]Point, ny)
 	for j := range s {
@@ -53,7 +53,7 @@ func random2DPoints(rng *rand.Rand, nx, ny int) [][]Point {
 	return s
 }
 
-// comparePointSlices tests that two 2-D slices of morph.Points are the same
+// comparePointSlices tests that two 2-D slices of xmorph.Points are the same
 // size and contain the same values.  It aborts if not.
 func comparePointSlices(t *testing.T, s1, s2 [][]Point) {
 	if len(s1) != len(s2) {
@@ -72,7 +72,7 @@ func comparePointSlices(t *testing.T, s1, s2 [][]Point) {
 }
 
 // TestMeshFromPoints ensures we can create meshes from various-sized
-// 2-D slices of morph.Points.
+// 2-D slices of xmorph.Points.
 func TestMeshFromPoints(t *testing.T) {
 	// Create a set of slices.
 	rng := rand.New(rand.NewSource(11))
@@ -135,7 +135,7 @@ func random2DImagePoints(rng *rand.Rand, nx, ny int) [][]image.Point {
 	return s
 }
 
-// compareImageePointSlices tests that two 2-D slices of morph.Points are the
+// compareImageePointSlices tests that two 2-D slices of xmorph.Points are the
 // same size and contain the same values.  It aborts if not.
 func compareImagePointSlices(t *testing.T, s1, s2 [][]image.Point) {
 	if len(s1) != len(s2) {
